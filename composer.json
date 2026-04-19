@@ -1,0 +1,50 @@
+{
+    "name": "igancev/work-reporter",
+    "description": "A versatile CLI tool for automated reporting of work time. It bridges local time-tracking data (like JSON files or SuperProductivity sync files) with professional task trackers, ensuring your worklogs are always up to date.",
+    "license": "MIT",
+    "type": "project",
+    "keywords": [
+        "time-tracking",
+        "worklog",
+        "time-entry",
+        "youtrack",
+        "superproductivity",
+        "cli",
+        "automation",
+        "reporting",
+        "productivity-tool"
+    ],
+    "require": {
+        "php": "^8.4",
+        "symfony/console": "^7.2",
+        "symfony/dotenv": "^7.2",
+        "amphp/http-client": "^5.3"
+    },
+    "scripts": {
+        "cs": "vendor/bin/phpcs -p",
+        "cs-fix": "vendor/bin/phpcbf",
+        "stat-analyze": "vendor/bin/phpstan analyse --memory-limit=512M",
+        "unit": "vendor/bin/phpunit"
+    },
+    "autoload": {
+        "psr-4": {
+            "Igancev\\WorkReporter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^8.0",
+        "phpunit/phpunit": "^12.5",
+        "squizlabs/php_codesniffer": "^4.0",
+        "phpstan/phpstan": "^2.1"
+    }
+}

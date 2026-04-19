@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Amp\Http\Client\Connection\DefaultConnectionFactory;
+use Amp\Http\Client\Connection\UnlimitedConnectionPool;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Socket\DnsSocketConnector;
+use Igancev\WorkReporter\Destination\YouTrack\YouTrackDestination;
+use Igancev\WorkReporter\Source\SuperProductivity\SuperProductivitySyncSource;
+use Igancev\WorkReporter\WorkReportCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Dotenv\Dotenv;
+
+$dotenv = new Dotenv();
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv->load(__DIR__ . '/../.env');
+}
+
+// todo: move to DI container
+$workReportCommand = new WorkReportCommand(
+        new SuperProductivitySyncSource(
+                $_ENV['SUPERPRODUCTIVITY_SYNC_FILE']
+        ),
+        new YouTrackDestination(
+                new HttpClientBuilder()
+                        ->usingPool(
+                                new UnlimitedConnectionPool(new DefaultConnectionFactory(new DnsSocketConnector()))
+                        )
+                        ->build(),
+                $_ENV['YOUTRACK_URL'],
+                $_ENV['YOUTRACK_TOKEN']
+        )
+);
+
+$application = new Application();
+$application->addCommand($workReportCommand);
+$application->run();
