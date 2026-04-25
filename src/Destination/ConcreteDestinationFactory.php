@@ -13,11 +13,10 @@ use InvalidArgumentException;
 
 final readonly class ConcreteDestinationFactory implements DestinationFactory
 {
-    public function build(string $destination): Destination
+    public function build(DestinationType $destination): Destination
     {
         return match ($destination) {
-            'youtrack' => $this->buildYouTrackDestination(),
-            default => throw new InvalidArgumentException('Unknown destination: ' . $destination),
+            DestinationType::YouTrack => $this->buildYouTrackDestination(),
         };
     }
 

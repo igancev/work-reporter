@@ -9,12 +9,11 @@ use Igancev\WorkReporter\Source\SuperProductivity\SuperProductivitySyncSource;
 
 final readonly class ConcreteSourceFactory implements TimeEntriesSourceFactory
 {
-    public function build(string $source): TimeEntriesSource
+    public function build(SourceType $source): TimeEntriesSource
     {
         return match ($source) {
-            'plain-json' => $this->buildPlainJsonSource(),
-            'super-productivity' => $this->buildFromSuperProductivitySource(),
-            default => throw new \InvalidArgumentException('Unknown source: ' . $source),
+            SourceType::PlainJson => $this->buildPlainJsonSource(),
+            SourceType::SuperProductivity => $this->buildFromSuperProductivitySource(),
         };
     }
 

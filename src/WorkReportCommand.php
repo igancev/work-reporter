@@ -6,6 +6,8 @@ use DateTimeImmutable;
 use Igancev\WorkReporter\Destination\Destination;
 use Igancev\WorkReporter\Destination\DestinationException;
 use Igancev\WorkReporter\Destination\DestinationFactory;
+use Igancev\WorkReporter\Destination\DestinationType;
+use Igancev\WorkReporter\Source\SourceType;
 use Igancev\WorkReporter\Source\SourceException;
 use Igancev\WorkReporter\Source\TimeEntriesSource;
 use Igancev\WorkReporter\Source\TimeEntriesSourceFactory;
@@ -38,8 +40,8 @@ class WorkReportCommand extends Command
         TimeEntriesSourceFactory $timeEntriesSourceFactory,
         DestinationFactory $destinationFactory,
     ) {
-        $this->timeEntriesSource = $timeEntriesSourceFactory->build('super-productivity');
-        $this->destination = $destinationFactory->build('youtrack');
+        $this->timeEntriesSource = $timeEntriesSourceFactory->build(SourceType::SuperProductivity);
+        $this->destination = $destinationFactory->build(DestinationType::YouTrack);
 
         parent::__construct();
     }

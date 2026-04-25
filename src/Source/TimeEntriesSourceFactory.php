@@ -6,5 +6,5 @@ namespace Igancev\WorkReporter\Source;
 
 interface TimeEntriesSourceFactory
 {
-    public function build(string $source): TimeEntriesSource;
+    public function build(SourceType $source): TimeEntriesSource;
 }

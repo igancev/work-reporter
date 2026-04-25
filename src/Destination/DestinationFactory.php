@@ -6,5 +6,5 @@ namespace Igancev\WorkReporter\Destination;
 
 interface DestinationFactory
 {
-    public function build(string $destination): Destination;
+    public function build(DestinationType $destination): Destination;
 }
