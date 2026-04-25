@@ -1,0 +1,27 @@
+name: 📦 Build Linux binary
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: docker build -t work-reporter-builder .
+
+      - name: Extract binary
+        run: |
+          mkdir -p dist
+          CONTAINER_ID=$(docker create work-reporter-builder)
+          docker cp $CONTAINER_ID:/.output/work-reporter dist/work-reporter-${{ env.VERSION }}-linux-amd64
+          docker rm $CONTAINER_ID
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/work-reporter-*

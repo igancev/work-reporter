@@ -17,3 +17,6 @@ stat-analyze:
 
 unit:
 	composer unit
+
+build-binary:
+	bash build-binary.sh

@@ -36,4 +36,5 @@ $workReportCommand = new WorkReportCommand(
 
 $application = new Application();
 $application->addCommand($workReportCommand);
+$application->setDefaultCommand($workReportCommand->getName() ?? 'default', true);
 $application->run();

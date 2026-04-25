@@ -2,6 +2,8 @@
 /vendor
 /.phpunit.cache
 .env
+/.build/
+/dist/
 
 # llm
 /.claude/settings.local.json

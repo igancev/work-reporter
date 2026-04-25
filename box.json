@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/box-project/box/main/res/schema.json",
+  "compactors": [
+    "KevinGH\\Box\\Compactor\\Json",
+    "KevinGH\\Box\\Compactor\\Php"
+  ],
+  "annotations": false,
+  "check-requirements": false,
+  "dump-autoload": false,
+  "compression": "GZ",
+  "directories": [
+    "src",
+    "vendor"
+  ],
+  "files": [
+    "bin/console",
+    "composer.json",
+    "composer.lock"
+  ],
+  "main": "bin/console",
+  "output": ".build/phar/work-reporter.phar"
+}
