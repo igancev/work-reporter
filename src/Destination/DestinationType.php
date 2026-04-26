@@ -6,5 +6,5 @@ namespace Igancev\WorkReporter\Destination;
 
 enum DestinationType: string
 {
-    case YouTrack = 'youtrack';
+    case YouTrack = 'youTrack';
 }

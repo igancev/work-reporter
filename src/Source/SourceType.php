@@ -6,6 +6,6 @@ namespace Igancev\WorkReporter\Source;
 
 enum SourceType: string
 {
-    case PlainJson = 'plain-json';
-    case SuperProductivity = 'super-productivity';
+    case PlainJson = 'plainJson';
+    case SuperProductivity = 'superProductivity';
 }
