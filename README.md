@@ -7,23 +7,26 @@
 
 ---
 
-### 🚀 What is it?
+### 😩 The Problem
 
-**Work Reporter** is a command-line tool that reads time entries from local sources (time trackers) and automatically submits them to your task tracker. No more manual worklog filling — just track your time as usual and let Work Reporter handle the rest.
+At work, you need to log time spent on tasks. Throughout the day you switch between different tasks and activities, but task trackers like YouTrack often lack convenient built-in time tracking tools. Meanwhile, dedicated time trackers like [SuperProductivity](https://super-productivity.com/) do this job perfectly — but at the end of the day, manually copying worklogs from one tool to another is tedious, repetitive, and boring.
 
-### ✨ Features
+### 🚀 The Solution
 
-- 📥 **Data sources:**
+**Work Reporter** automates this routine. It reads time entries from your local time tracker and submits them to your task tracker with a single command. Just configure the source-to-destination mapping once, and let Work Reporter handle all the dirty work for you.
+
+### ✨ Features & Supported Integrations
+
+- 📥 **Supported sources:**
   - [SuperProductivity](https://super-productivity.com/) (sync file)
   - Plain JSON file
-- 📤 **Task trackers:**
+- 📤 **Supported destinations:**
   - [YouTrack](https://www.jetbrains.com/youtrack/)
-
-### 📋 How it works
-
-- 🔀 Automatically groups identical time entries
-- 🕐 Filters out entries shorter than 1 minute
+- 🔀 Automatic grouping of identical time entries
+- 🕐 Filtering out entries shorter than 1 minute
 - 🔧 Simple YAML configuration
+
+> 🏗️ The architecture is extensible — adding new sources and destinations is straightforward.
 
 ---
 
