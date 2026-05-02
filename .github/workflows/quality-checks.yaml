@@ -45,5 +45,12 @@ jobs:
       - name: Run Unit tests
         run: composer unit
 
+      - name: Pull YouTrack image for functional tests
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: docker pull ghcr.io/igancev/youtrack-image-for-ci/youtrack-image-for-ci:2026.1.12848
+
       - name: Run Functional tests
         run: composer functional
