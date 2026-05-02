@@ -10,7 +10,7 @@ jobs:
   build-macos:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Extract version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
 
