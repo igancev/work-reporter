@@ -6,7 +6,6 @@ namespace Tests\Source\SuperProductivity;
 
 use Igancev\WorkReporter\Source\SuperProductivity\Storage;
 use Igancev\WorkReporter\Source\SuperProductivity\Tag;
-use Igancev\WorkReporter\Source\SuperProductivity\Task;
 use Igancev\WorkReporter\Source\SuperProductivity\TaskFactory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,7 +47,6 @@ final class TaskFactoryTest extends TestCase
         $task = $this->factory->fromTaskId($taskId);
 
         // Assert
-        $this->assertInstanceOf(Task::class, $task);
         $this->assertSame($taskId, $task->id);
         $this->assertSame('Simple Task', $task->title);
         $this->assertNull($task->parentTitle);
