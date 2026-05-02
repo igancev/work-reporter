@@ -4,6 +4,5 @@ services:
         volumes:
             - ./tests/data/youtrack/2026-1-12848/data:/opt/youtrack/data
             - ./tests/data/youtrack/2026-1-12848/conf:/opt/youtrack/conf
-
         ports:
             - '8080:8080'

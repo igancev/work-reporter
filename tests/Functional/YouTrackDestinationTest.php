@@ -30,7 +30,7 @@ class YouTrackDestinationTest extends TestCase
         $destination = new YouTrackDestination(
             $httpClient,
             "http://{$host}:{$port}",
-            'perm-YWRtaW4=.NDEtMA==.eOMX0GveJDOjHI8QZ97EQpYB7CXerc',
+            'perm-YWRtaW4=.NDEtMA==.ftTjeUcU3jtQZ0tYIq0PXteDQI19DD',
         );
 
         $entries = [
@@ -54,16 +54,9 @@ class YouTrackDestinationTest extends TestCase
 
     protected function setUp(): void
     {
-        $youtrackContainer = new GenericContainer('jetbrains/youtrack:2026.1.12848')
-            ->withAutoRemove(false) // todo: проверить autoRemove и решить вопрос с mount
-            ->withMount(
-                '/home/archpad/www/any/work-reporter/tests/data/youtrack/2026-1-12848/data',
-                '/opt/youtrack/data'
-            )
-            ->withMount(
-                '/home/archpad/www/any/work-reporter/tests/data/youtrack/2026-1-12848/conf',
-                '/opt/youtrack/conf'
-            )
+        $youtrackContainer = new GenericContainer(
+            'ghcr.io/igancev/youtrack-image-for-ci/youtrack-image-for-ci:2026.1.12848'
+        )
             ->withExposedPorts(8080)
             ->withWait(
                 new WaitForHttp(8080)
