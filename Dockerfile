@@ -1,5 +1,5 @@
 ARG COMPOSER_VERSION="2.8"
-FROM ghcr.io/igancev/work-reporter-builder/bin-builder:0.0.1 AS builder
+FROM ghcr.io/igancev/work-reporter-builder/bin-builder:0.0.2 AS builder
 
 WORKDIR /app
 COPY . .
