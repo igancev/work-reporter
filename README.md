@@ -145,10 +145,17 @@ The project follows a **Source → Destination** pattern:
 
 ### 🤝 Contributing
 
+Contributions are welcome! Please read the [Contribution Guide](CONTRIBUTING.md)
+before opening a Pull Request — it describes the testing and CI requirements
+your change must satisfy.
+
+Quick start:
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/awesome`)
-3. Make sure `make check-all` passes ✅
-4. Open a Pull Request
+3. Cover your changes with tests
+4. Make sure `make check-all` passes ✅
+5. Open a Pull Request
 
 ---
 
