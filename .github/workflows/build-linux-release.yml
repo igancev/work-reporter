@@ -14,6 +14,9 @@ jobs:
       - name: Extract version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
 
+      - name: Write version.json
+        run: echo "{\"version\":\"${VERSION}\"}" > version.json
+
       - name: Build Docker image
         run: docker build -t work-reporter-builder .
 

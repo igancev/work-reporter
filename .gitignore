@@ -4,6 +4,7 @@
 .env
 /.build/
 /dist/
+/version.json
 
 # llm
 /.claude/settings.local.json

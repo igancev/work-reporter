@@ -15,7 +15,8 @@
   "files": [
     "bin/console",
     "composer.json",
-    "composer.lock"
+    "composer.lock",
+    "version.json"
   ],
   "main": "bin/console",
   "output": ".build/phar/work-reporter.phar"
