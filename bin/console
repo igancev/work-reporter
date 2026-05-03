@@ -14,7 +14,16 @@ $workReportCommand = new WorkReportCommand(
         $configProvider,
 );
 
-$application = new Application();
+$version = 'dev';
+$versionFile = __DIR__ . '/../version.json';
+if (file_exists($versionFile)) {
+    $decoded = json_decode((string) file_get_contents($versionFile), true);
+    if (is_array($decoded) && isset($decoded['version']) && is_string($decoded['version']) && $decoded['version'] !== '') {
+        $version = $decoded['version'];
+    }
+}
+
+$application = new Application('work-reporter', $version);
 $application->addCommand($workReportCommand);
 $application->setDefaultCommand($workReportCommand->getName() ?? 'default', true);
 $application->run();

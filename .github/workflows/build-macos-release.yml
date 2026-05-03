@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
+      - name: Write version.json
+        run: echo "{\"version\":\"${VERSION}\"}" > version.json
+
       - name: Download and setup SPC
         run: |
           curl -L https://github.com/crazywhalecc/static-php-cli/releases/latest/download/spc-macos-aarch64.tar.gz -o spc.tar.gz
