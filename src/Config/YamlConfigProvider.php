@@ -34,7 +34,7 @@ class YamlConfigProvider implements ConfigProvider
             throw new ConfigException(sprintf(
                 "Configuration file not found at: %s\n\n"
                 . "- You can generate a default configuration file by running: `work-reporter init`\n"
-                . "- Or specify a custom config path using the `-c flag: `work-reporter -c /path/to/config.yaml`",
+                . "- Or specify a custom config path using the `-c` flag: `work-reporter -c /path/to/config.yaml`",
                 $path,
             ));
         }
