@@ -39,7 +39,8 @@
     },
     "config": {
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "require-dev": {
@@ -48,6 +49,7 @@
         "squizlabs/php_codesniffer": "^4.0",
         "phpstan/phpstan": "^2.1",
         "testcontainers/testcontainers": "^1.0",
-        "symfony/http-client": "^8.0"
+        "symfony/http-client": "^8.0",
+        "slevomat/coding-standard": "^8.28"
     }
 }
