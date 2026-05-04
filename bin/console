@@ -1,6 +1,10 @@
 #!/usr/bin/env php
 <?php
+
+declare(strict_types=1);
+
 require __DIR__ . '/../vendor/autoload.php';
+
 use Igancev\WorkReporter\Config\YamlConfigProvider;
 use Igancev\WorkReporter\Destination\ConcreteDestinationFactory;
 use Igancev\WorkReporter\Source\ConcreteSourceFactory;
@@ -13,6 +17,8 @@ $workReportCommand = new WorkReportCommand(
         new ConcreteDestinationFactory($configProvider),
         $configProvider,
 );
+$binaryPath = $_SERVER['PHP_SELF'] ?? 'work-reporter';
+$workReportCommand->setName($binaryPath);
 
 $version = 'dev';
 $versionFile = __DIR__ . '/../version.json';
