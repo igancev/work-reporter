@@ -48,6 +48,18 @@ work-reporter --version
 
 ---
 
+### 🔧 Quick Start
+
+Generate a default configuration file:
+
+```bash
+work-reporter init
+```
+
+This creates a config file at `~/.config/work-reporter/config.yaml` with a template you can edit.
+
+---
+
 ### ⚙️ Configuration
 
 Create a config file at `~/.config/work-reporter/config.yaml`:
