@@ -3,6 +3,7 @@
 namespace Igancev\WorkReporter;
 
 use DateTimeImmutable;
+use Igancev\WorkReporter\Config\ConfigException;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Destination\Destination;
 use Igancev\WorkReporter\Destination\DestinationException;
@@ -98,8 +99,15 @@ class WorkReportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $timeEntriesSource = $this->timeEntriesSourceFactory->build($this->configProvider->get()->source);
-        $this->destination = $this->destinationFactory->build($this->configProvider->get()->destination);
+        try {
+            $config = $this->configProvider->get();
+        } catch (ConfigException $e) {
+            $this->io->error($e->getMessage());
+            return Command::FAILURE;
+        }
+
+        $timeEntriesSource = $this->timeEntriesSourceFactory->build($config->source);
+        $this->destination = $this->destinationFactory->build($config->destination);
 
         try {
             $timeEntries = $timeEntriesSource->fetchTimeEntries($this->from, $this->to);

@@ -31,7 +31,12 @@ class YamlConfigProvider implements ConfigProvider
         $path = str_replace("~", (string)getenv("HOME"), $this->configPath);
 
         if (!file_exists($path)) {
-            throw new ConfigException(sprintf("Configuration file not found at: %s", $path));
+            throw new ConfigException(sprintf(
+                "Configuration file not found at: %s\n\n"
+                . "- You can generate a default configuration file by running: `work-reporter init`\n"
+                . "- Or specify a custom config path using the `-c flag: `work-reporter -c /path/to/config.yaml`",
+                $path,
+            ));
         }
 
         try {
