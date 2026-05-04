@@ -8,6 +8,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use Igancev\WorkReporter\Config\YamlConfigProvider;
 use Igancev\WorkReporter\Destination\ConcreteDestinationFactory;
 use Igancev\WorkReporter\Source\ConcreteSourceFactory;
+use Igancev\WorkReporter\InitCommand;
 use Igancev\WorkReporter\WorkReportCommand;
 use Symfony\Component\Console\Application;
 
@@ -31,5 +32,6 @@ if (file_exists($versionFile)) {
 
 $application = new Application('work-reporter', $version);
 $application->addCommand($workReportCommand);
-$application->setDefaultCommand($workReportCommand->getName() ?? 'default', true);
+$application->addCommand(new InitCommand());
+$application->setDefaultCommand($workReportCommand->getName() ?? 'default');
 $application->run();

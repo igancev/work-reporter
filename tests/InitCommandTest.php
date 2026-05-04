@@ -1,0 +1,111 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests;
+
+use Igancev\WorkReporter\InitCommand;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
+
+class InitCommandTest extends TestCase
+{
+    private string $tempDir;
+    private string $configDir;
+    private string $configPath;
+    private string|false $originalHome;
+
+    protected function setUp(): void
+    {
+        $this->tempDir = sys_get_temp_dir() . '/work-reporter-test-' . uniqid();
+        $this->configDir = $this->tempDir . '/.config/work-reporter';
+        $this->configPath = $this->configDir . '/config.yaml';
+        $this->originalHome = getenv('HOME');
+
+        putenv('HOME=' . $this->tempDir);
+    }
+
+    protected function tearDown(): void
+    {
+        if (file_exists($this->configPath)) {
+            unlink($this->configPath);
+        }
+        if (is_dir($this->configDir)) {
+            rmdir($this->configDir);
+        }
+        $parentDir = dirname($this->configDir);
+        if (is_dir($parentDir)) {
+            rmdir($parentDir);
+        }
+        if (is_dir($this->tempDir)) {
+            rmdir($this->tempDir);
+        }
+
+        if ($this->originalHome !== false) {
+            putenv('HOME=' . $this->originalHome);
+        }
+    }
+
+    public function testCreatesConfigFileSuccessfully(): void
+    {
+        $command = new InitCommand();
+        $tester = new CommandTester($command);
+
+        $status = $tester->execute([]);
+
+        $this->assertSame(Command::SUCCESS, $status);
+        $this->assertFileExists($this->configPath);
+        $this->assertStringContainsString('Configuration file created', $tester->getDisplay());
+
+        $content = (string) file_get_contents($this->configPath);
+        $this->assertStringContainsString('source:', $content);
+        $this->assertStringContainsString('destination:', $content);
+        $this->assertStringContainsString('youTrack', $content);
+    }
+
+    public function testCreatesDirectoryIfNotExists(): void
+    {
+        $this->assertDirectoryDoesNotExist($this->configDir);
+
+        $command = new InitCommand();
+        $tester = new CommandTester($command);
+
+        $tester->execute([]);
+
+        $this->assertDirectoryExists($this->configDir);
+        $this->assertFileExists($this->configPath);
+    }
+
+    public function testWarnsIfConfigAlreadyExists(): void
+    {
+        mkdir($this->configDir, 0755, true);
+        file_put_contents($this->configPath, 'existing content');
+
+        $command = new InitCommand();
+        $tester = new CommandTester($command);
+        $tester->setInputs(['no']);
+
+        $status = $tester->execute([]);
+
+        $this->assertSame(Command::SUCCESS, $status);
+        $this->assertStringContainsString('already exists', $tester->getDisplay());
+        $this->assertSame('existing content', file_get_contents($this->configPath));
+    }
+
+    public function testOverwritesConfigWhenConfirmed(): void
+    {
+        mkdir($this->configDir, 0755, true);
+        file_put_contents($this->configPath, 'old content');
+
+        $command = new InitCommand();
+        $tester = new CommandTester($command);
+        $tester->setInputs(['yes']);
+
+        $status = $tester->execute([]);
+
+        $this->assertSame(Command::SUCCESS, $status);
+        $this->assertNotSame('old content', file_get_contents($this->configPath));
+        $this->assertStringContainsString('source:', (string) file_get_contents($this->configPath));
+    }
+}
