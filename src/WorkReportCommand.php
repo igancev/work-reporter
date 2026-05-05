@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\title;
 
 #[AsCommand(
     name: 'work:report',
@@ -107,6 +108,8 @@ class WorkReportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        title('Work Reporter');
+
         try {
             $config = $this->configProvider->get();
         } catch (ConfigException $e) {
