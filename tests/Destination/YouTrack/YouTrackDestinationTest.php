@@ -120,7 +120,7 @@ final class YouTrackDestinationTest extends TestCase
 
         // Assert
         $this->expectException(DestinationException::class);
-        $this->expectExceptionMessage('Failed to fetch projects from destination');
+        $this->expectExceptionMessage('Failed to fetch data from destination');
 
         // Act
         $this->destination->logTimeEntries([$entry]);
