@@ -19,6 +19,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+use function Laravel\Prompts\confirm;
+
 #[AsCommand(
     name: 'work:report',
     description: 'Export and report your work time entries from various sources (JSON, SuperProductivity) ' .
@@ -81,6 +83,12 @@ class WorkReportCommand extends Command
                     description: 'Minimum duration to include (e.g. 1m, 5m, 1h). Entries shorter will be ignored.',
                     default: '1m',
                 ),
+                new InputOption(
+                    name: 'yes',
+                    shortcut: 'y',
+                    mode: InputOption::VALUE_NONE,
+                    description: 'Do not ask for confirmation and assume "yes" as the answer.',
+                ),
             ])
         );
     }
@@ -133,7 +141,9 @@ class WorkReportCommand extends Command
 
         $this->displayTimeEntries($finalTimeEntries);
 
-        if (!$this->io->confirm('Do you want to send these time entries to YouTrack?', false)) {
+        $shouldSend = $input->getOption('yes') || confirm('Do you want to send these time entries to YouTrack?');
+
+        if (!$shouldSend) {
             $this->io->note('Sending cancelled.');
             return Command::SUCCESS;
         }

@@ -109,7 +109,7 @@ destinations:
 work-reporter
 
 # Submit worklogs for a specific date range (optional)
-work-reporter --from 2026-05-01 --to 2026-05-02
+work-reporter --from="2026-05-01" --to="2026-05-02"
 ```
 
 > 📅 Both `--from` and `--to` are optional. If omitted, today's date is used by default.

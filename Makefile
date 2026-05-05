@@ -1,5 +1,5 @@
 run:
-	bin/console work:report --from 2026-02-20 --to 2026-02-20
+	bin/console --from="2026-05-01" --to="2026-05-02"
 
 check-all:
 	make cs

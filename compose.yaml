@@ -1,8 +1,6 @@
 services:
     youtrack:
-        image: jetbrains/youtrack:2026.1.12848
-        volumes:
-            - ./tests/data/youtrack/2026-1-12848/data:/opt/youtrack/data
-            - ./tests/data/youtrack/2026-1-12848/conf:/opt/youtrack/conf
+        # http://localhost:8080
+        image: ghcr.io/igancev/youtrack-image-for-ci/youtrack-image-for-ci:2026.1.12848
         ports:
             - '8080:8080'

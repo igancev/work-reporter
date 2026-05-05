@@ -24,6 +24,8 @@ use Igancev\WorkReporter\Source\TimeEntriesSourceFactory;
 use Igancev\WorkReporter\TimeEntry;
 use Igancev\WorkReporter\WorkReportCommand;
 use InvalidArgumentException;
+use Laravel\Prompts\ConfirmPrompt;
+use Laravel\Prompts\Prompt;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -63,6 +65,15 @@ final class WorkReportCommandTest extends TestCase
 
         $command = new WorkReportCommand($sourceFactory, $destinationFactory, $configProvider);
         $this->tester = new CommandTester($command);
+
+        Prompt::interactive(false);
+    }
+
+    protected function tearDown(): void
+    {
+        Prompt::interactive();
+        Prompt::fallbackWhen(false);
+        ConfirmPrompt::fallbackUsing(fn() => true); // reset to default if needed
     }
 
     public function testInvalidDateFormatThrowsException(): void
@@ -130,9 +141,9 @@ final class WorkReportCommandTest extends TestCase
 
         $this->source->method('fetchTimeEntries')->willReturn([$entry1, $entry2]);
 
-        // Act
-        // min-duration = 10m, so T1 should be filtered out
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--min-duration' => '10m']);
 
         // Assert
@@ -151,7 +162,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry1, $entry2]);
 
         // Act
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--no-group' => true]);
 
         // Assert
@@ -173,7 +186,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry1, $entry2]);
 
         // Act
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--group' => true]);
 
         // Assert
@@ -206,7 +221,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry]);
 
         // Act
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--daily-goal' => '8h'], ['decorated' => true]);
 
         // Assert
@@ -223,7 +240,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry]);
 
         // Act
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--daily-goal' => '7h'], ['decorated' => true]);
 
         // Assert
@@ -239,8 +258,11 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry]);
         $this->destination->expects($this->never())->method('logTimeEntries');
 
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
+
         // Act
-        $this->tester->setInputs(['no']);
         $status = $this->tester->execute([]);
 
         // Assert
@@ -258,7 +280,6 @@ final class WorkReportCommandTest extends TestCase
             ->willReturn(new BatchDeliveryResult([$entry], []));
 
         // Act
-        $this->tester->setInputs(['yes']);
         $status = $this->tester->execute([]);
 
         // Assert
@@ -278,7 +299,6 @@ final class WorkReportCommandTest extends TestCase
             ->willReturn(new BatchDeliveryResult([$entry1], [$failure]));
 
         // Act
-        $this->tester->setInputs(['yes']);
         $status = $this->tester->execute([]);
 
         // Assert
@@ -310,7 +330,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry]);
 
         // Act
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--min-duration' => '10m']);
 
         // Assert
@@ -330,7 +352,6 @@ final class WorkReportCommandTest extends TestCase
             ->willReturn(new BatchDeliveryResult([], [$failure]));
 
         // Act
-        $this->tester->setInputs(['yes']);
         $status = $this->tester->execute([]);
 
         // Assert
@@ -353,7 +374,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$shortEntry, $normalEntry]);
 
         // Act
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--min-duration' => '']);
 
         // Assert
@@ -370,8 +393,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry]);
 
         // Act
-        // "abc" is not a valid duration, Duration::fromString returns 0m
-        $this->tester->setInputs(['no']);
+        // Force "No" answer for confirm()
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
         $this->tester->execute(['--daily-goal' => 'abc']);
 
         // Assert
@@ -391,11 +415,35 @@ final class WorkReportCommandTest extends TestCase
             ->willThrowException(new DestinationException('Connection lost'));
 
         // Act
-        $this->tester->setInputs(['yes']);
         $status = $this->tester->execute([]);
 
         // Assert
         $this->assertSame(Command::FAILURE, $status);
         $this->assertStringContainsString('Connection lost', $this->tester->getDisplay());
+    }
+    public function testYesOptionSkipsConfirmation(): void
+    {
+        // Arrange
+        $entry = new TimeEntry('T1', Duration::fromString('1h'), 'Dev', new DateTimeImmutable());
+        $this->source->method('fetchTimeEntries')->willReturn([$entry]);
+
+        // Expect logTimeEntries to BE called
+        $this->destination->expects($this->once())
+            ->method('logTimeEntries')
+            ->willReturn(new BatchDeliveryResult([$entry], []));
+
+        // In non-interactive mode it returns default (true) by default,
+        // but we want to test specifically the --yes option, which should skip the confirm() call.
+        // If confirm() is called and returns false, the test will fail.
+        // We force confirm() to return false to ensure it is NOT called.
+        ConfirmPrompt::fallbackUsing(fn() => false);
+        Prompt::fallbackWhen(true);
+
+        // Act
+        $status = $this->tester->execute(['--yes' => true]);
+
+        // Assert
+        $this->assertSame(Command::SUCCESS, $status);
+        $this->assertStringContainsString('All 1 time entries imported successfully!', $this->tester->getDisplay());
     }
 }
