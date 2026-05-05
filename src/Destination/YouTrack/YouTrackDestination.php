@@ -138,10 +138,19 @@ final class YouTrackDestination implements Destination
 
                 // todo: make error catch: 404 etc.
                 if ($response->getStatus() >= 400) {
-                    throw new DestinationException('Failed to fetch projects from destination', [
-                        'httpStatusCode' => $response->getStatus(),
-                        'body' => $body,
-                    ]);
+                    throw new DestinationException(
+                        sprintf(
+                            "Failed to fetch data from destination:\n\n"
+                            . "- HTTP status code: %d\n"
+                            . "- Body: %s",
+                            $response->getStatus(),
+                            $body
+                        ),
+                        [
+                            'httpStatusCode' => $response->getStatus(),
+                            'body' => $body,
+                        ]
+                    );
                 }
 
                 $jsonData = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
