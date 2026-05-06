@@ -128,7 +128,7 @@ class WorkReportCommand extends Command
         }
 
         if (empty($timeEntries)) {
-            $this->io->warning('No time entries found in the source.');
+            warning("No time entries found in the source: \"{$config->source->value}\"");
             return Command::SUCCESS;
         }
 
@@ -176,7 +176,7 @@ class WorkReportCommand extends Command
         }
 
         foreach ($entriesByDate as $date => $entries) {
-            $this->io->section("Date: $date");
+            intro("Date: $date");
             $tableData = [];
             $totalDuration = Duration::fromMinutes(0);
 
@@ -191,7 +191,7 @@ class WorkReportCommand extends Command
                 $totalDuration = $totalDuration->add($entry->duration);
             }
 
-            $this->io->table(
+            table(
                 ['Task ID', 'Duration', 'Work Type', 'Date', 'Comment'],
                 $tableData
             );
