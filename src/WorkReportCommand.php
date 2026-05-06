@@ -20,7 +20,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\intro;
+use function Laravel\Prompts\table;
 use function Laravel\Prompts\title;
+use function Laravel\Prompts\warning;
 
 #[AsCommand(
     name: 'work:report',
