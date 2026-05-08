@@ -13,6 +13,7 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\Http\InvalidHeaderException;
 use DateTimeImmutable;
+use Igancev\WorkReporter\Destination\DeliveryEvent;
 use Igancev\WorkReporter\Destination\DestinationException;
 use Igancev\WorkReporter\Destination\YouTrack\YouTrackDestination;
 use Igancev\WorkReporter\Duration;
@@ -70,12 +71,14 @@ final class YouTrackDestinationTest extends TestCase
             );
 
         // Act
-        $result = $this->destination->logTimeEntries([$entry]);
+        $stream = $this->destination->logTimeEntries([$entry]);
+        $events = iterator_to_array($stream);
 
         // Assert
-        $this->assertTrue($result->isSuccessful());
-        $this->assertSame(1, $result->successfulCount());
-        $this->assertSame(0, $result->failuresCount());
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(DeliveryEvent::class, $events[0]);
+        $this->assertTrue($events[0]->success);
+        $this->assertNull($events[0]->error);
     }
 
     private function createEntry(string $taskId, string $workType): TimeEntry
@@ -185,15 +188,17 @@ final class YouTrackDestinationTest extends TestCase
             );
 
         // Act
-        $result = $this->destination->logTimeEntries([$entry]);
+        $stream = $this->destination->logTimeEntries([$entry]);
+        $events = iterator_to_array($stream);
 
         // Assert
-        $this->assertFalse($result->isSuccessful());
-        $this->assertSame(0, $result->successfulCount());
-        $this->assertSame(1, $result->failuresCount());
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(DeliveryEvent::class, $events[0]);
+        $this->assertFalse($events[0]->success);
+        $this->assertNotNull($events[0]->error);
         $this->assertStringContainsString(
             'Failed to report time: 500',
-            $result->failures()[0]->exception->getMessage()
+            $events[0]->error->getMessage()
         );
     }
 

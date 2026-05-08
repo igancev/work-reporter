@@ -16,10 +16,11 @@
     ],
     "require": {
         "php": "^8.4",
-        "symfony/console": "^7.2",
         "amphp/http-client": "^5.3",
-        "symfony/yaml": "^8.0",
-        "laravel/prompts": "^0.3.17"
+        "amphp/pipeline": "^1.2",
+        "laravel/prompts": "^0.3.17",
+        "symfony/console": "^7.2",
+        "symfony/yaml": "^8.0"
     },
     "scripts": {
         "cs": "vendor/bin/phpcs -p",

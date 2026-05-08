@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use ArrayIterator;
 use DateTimeImmutable;
 use Exception;
 use Igancev\WorkReporter\Config\Config;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Config\DestinationConfig\DestinationsConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SourcesConfig;
-use Igancev\WorkReporter\Destination\BatchDeliveryResult;
-use Igancev\WorkReporter\Destination\DeliveryFailure;
+use Igancev\WorkReporter\Destination\DeliveryEvent;
+use Igancev\WorkReporter\Destination\DeliveryStream;
 use Igancev\WorkReporter\Destination\Destination;
 use Igancev\WorkReporter\Destination\DestinationException;
 use Igancev\WorkReporter\Destination\DestinationFactory;
@@ -32,6 +33,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Traversable;
 
 #[CoversClass(WorkReportCommand::class)]
 #[AllowMockObjectsWithoutExpectations]
@@ -277,7 +279,9 @@ final class WorkReportCommandTest extends TestCase
         $this->source->method('fetchTimeEntries')->willReturn([$entry]);
 
         $this->destination->method('logTimeEntries')
-            ->willReturn(new BatchDeliveryResult([$entry], []));
+            ->willReturn($this->createDeliveryStream([
+                new DeliveryEvent($entry, 10.0, true),
+            ]));
 
         // Act
         $status = $this->tester->execute([]);
@@ -294,9 +298,11 @@ final class WorkReportCommandTest extends TestCase
         $entry2 = new TimeEntry('T2', Duration::fromString('1h'), 'Dev', new DateTimeImmutable());
         $this->source->method('fetchTimeEntries')->willReturn([$entry1, $entry2]);
 
-        $failure = new DeliveryFailure($entry2, new Exception('Api Error'));
         $this->destination->method('logTimeEntries')
-            ->willReturn(new BatchDeliveryResult([$entry1], [$failure]));
+            ->willReturn($this->createDeliveryStream([
+                new DeliveryEvent($entry1, 10.0, true),
+                new DeliveryEvent($entry2, 10.0, false, new Exception('Api Error')),
+            ]));
 
         // Act
         $status = $this->tester->execute([]);
@@ -304,10 +310,7 @@ final class WorkReportCommandTest extends TestCase
         // Assert
         $this->assertSame(Command::FAILURE, $status);
         $display = $this->tester->getDisplay();
-        $this->assertStringContainsString('Partial Success', $display);
-        $this->assertStringContainsString('Successfully imported 1 entries.', $display);
-        $this->assertStringContainsString('Failures', $display);
-        $this->assertStringContainsString('Failed to import 1 entries:', $display);
+        $this->assertStringContainsString('Partially completed: 1 of 2 entries were imported successfully.', $display);
         $this->assertStringContainsString('Api Error', $display);
     }
 
@@ -347,9 +350,10 @@ final class WorkReportCommandTest extends TestCase
         $entry = new TimeEntry('T1', Duration::fromString('1h'), 'Dev', $date);
         $this->source->method('fetchTimeEntries')->willReturn([$entry]);
 
-        $failure = new DeliveryFailure($entry, new Exception('Server error'));
         $this->destination->method('logTimeEntries')
-            ->willReturn(new BatchDeliveryResult([], [$failure]));
+            ->willReturn($this->createDeliveryStream([
+                new DeliveryEvent($entry, 10.0, false, new Exception('Server error')),
+            ]));
 
         // Act
         $status = $this->tester->execute([]);
@@ -357,9 +361,7 @@ final class WorkReportCommandTest extends TestCase
         // Assert
         $this->assertSame(Command::FAILURE, $status);
         $display = $this->tester->getDisplay();
-        $this->assertStringNotContainsString('Partial Success', $display);
-        $this->assertStringContainsString('Failures', $display);
-        $this->assertStringContainsString('Failed to import 1 entries:', $display);
+        $this->assertStringNotContainsString('Partially completed', $display);
         $this->assertStringContainsString('Server error', $display);
     }
 
@@ -399,7 +401,7 @@ final class WorkReportCommandTest extends TestCase
         $this->tester->execute(['--daily-goal' => 'abc']);
 
         // Assert
-        // 1h >= 0m goal, so total should be displayed with info tag (not error)
+        // 1h >= 0m goal, so the total should be displayed with info tag (not error)
         $display = $this->tester->getDisplay();
         $this->assertStringContainsString('Total for 2026-01-01:', $display);
         $this->assertStringContainsString('1h', $display);
@@ -430,7 +432,9 @@ final class WorkReportCommandTest extends TestCase
         // Expect logTimeEntries to BE called
         $this->destination->expects($this->once())
             ->method('logTimeEntries')
-            ->willReturn(new BatchDeliveryResult([$entry], []));
+            ->willReturn($this->createDeliveryStream([
+                new DeliveryEvent($entry, 10.0, true),
+            ]));
 
         // In non-interactive mode it returns default (true) by default,
         // but we want to test specifically the --yes option, which should skip the confirm() call.
@@ -445,5 +449,24 @@ final class WorkReportCommandTest extends TestCase
         // Assert
         $this->assertSame(Command::SUCCESS, $status);
         $this->assertStringContainsString('All 1 time entries imported successfully!', $this->tester->getDisplay());
+    }
+
+    /**
+     * @param DeliveryEvent[] $events
+     * @return DeliveryStream<DeliveryEvent>
+     */
+    private function createDeliveryStream(array $events): DeliveryStream
+    {
+        return new readonly class ($events) implements DeliveryStream {
+            /** @param DeliveryEvent[] $events */
+            public function __construct(private array $events)
+            {
+            }
+
+            public function getIterator(): Traversable
+            {
+                return new ArrayIterator($this->events);
+            }
+        };
     }
 }

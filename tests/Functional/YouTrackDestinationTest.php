@@ -6,6 +6,7 @@ namespace Tests\Functional;
 
 use Amp\Http\Client\HttpClientBuilder;
 use DateTimeImmutable;
+use Igancev\WorkReporter\Destination\DeliveryEvent;
 use Igancev\WorkReporter\Destination\YouTrack\YouTrackDestination;
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\TimeEntry;
@@ -44,12 +45,16 @@ class YouTrackDestinationTest extends TestCase
         ];
 
         // Act
-        $result = $destination->logTimeEntries($entries);
+        $stream = $destination->logTimeEntries($entries);
+        $events = iterator_to_array($stream);
 
         // Assert
-        self::assertEmpty($result->failures());
-        self::assertSame(count($entries), $result->successfulCount());
-        self::assertSame(count($entries), count($result->successDelivered()));
+        self::assertCount(count($entries), $events);
+        foreach ($events as $event) {
+            self::assertInstanceOf(DeliveryEvent::class, $event);
+            self::assertTrue($event->success, $event->error?->getMessage() ?? '');
+            self::assertNull($event->error);
+        }
     }
 
     protected function setUp(): void

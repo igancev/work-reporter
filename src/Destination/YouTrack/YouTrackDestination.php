@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Igancev\WorkReporter\Destination\YouTrack;
 
 use Amp\ByteStream\BufferException;
@@ -9,10 +11,12 @@ use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\NullCancellation;
-use Igancev\WorkReporter\Destination\BatchDeliveryResult;
-use Igancev\WorkReporter\Destination\DeliveryFailure;
+use Amp\Pipeline\Queue;
+use Igancev\WorkReporter\Destination\DeliveryEvent;
+use Igancev\WorkReporter\Destination\DeliveryStream;
 use Igancev\WorkReporter\Destination\Destination;
 use Igancev\WorkReporter\Destination\DestinationException;
+use Igancev\WorkReporter\Destination\PipelineDeliveryStream;
 use Igancev\WorkReporter\TimeEntry;
 use JsonException;
 use RuntimeException;
@@ -48,32 +52,49 @@ final class YouTrackDestination implements Destination
 
     /**
      * @param iterable<TimeEntry> $timeEntries
+     * @return DeliveryStream<DeliveryEvent>
      * @throws DestinationException
      */
-    public function logTimeEntries(iterable $timeEntries): BatchDeliveryResult
+    public function logTimeEntries(iterable $timeEntries): DeliveryStream
     {
         $timeEntries = iterator_to_array($timeEntries);
         $workItems = $this->buildWorkItems($timeEntries);
 
-        $futures = [];
-        foreach ($workItems as $workItem) {
-            $futures[] = async(fn() => $this->reportWorkItem($workItem));
-        }
+        /** @var Queue<DeliveryEvent> $queue */
+        $queue = new Queue();
 
-        /** @var WorkItem[] $successes */
-        [$errors, $successes] = awaitAll($futures);
+        async(function () use ($queue, $workItems, $timeEntries) {
+            $futures = [];
+            foreach ($workItems as $index => $workItem) {
+                $futures[$index] = async(function () use ($queue, $workItem, $timeEntries, $index) {
+                    $startTime = hrtime(true);
+                    try {
+                        $this->reportWorkItem($workItem);
+                        $durationMs = (hrtime(true) - $startTime) / 1_000_000;
 
-        $failures = [];
-        foreach ($errors as $index => $error) {
-            $failures[] = new DeliveryFailure($timeEntries[$index], $error);
-        }
+                        $queue->push(new DeliveryEvent(
+                            $timeEntries[$index],
+                            $durationMs,
+                            true,
+                        ));
+                    } catch (Throwable $e) {
+                        $durationMs = (hrtime(true) - $startTime) / 1_000_000;
 
-        $successDelivered = [];
-        foreach ($successes as $index => $success) {
-            $successDelivered[] = $timeEntries[$index];
-        }
+                        $queue->push(new DeliveryEvent(
+                            $timeEntries[$index],
+                            $durationMs,
+                            false,
+                            $e,
+                        ));
+                    }
+                });
+            }
 
-        return new BatchDeliveryResult($successDelivered, $failures);
+            awaitAll($futures);
+            $queue->complete();
+        });
+
+        return new PipelineDeliveryStream($queue->pipe());
     }
 
     /**
@@ -115,9 +136,9 @@ final class YouTrackDestination implements Destination
     {
         $taskIdsUniqueByProject = new TaskIdCollection($taskIds)->filterUniqueByProject()->toArray();
 
-        $features = [];
+        $futures = [];
         foreach ($taskIdsUniqueByProject as $taskId) {
-            $features[] = async(function () use ($taskId): Response {
+            $futures[] = async(function () use ($taskId): Response {
                 $url = $this->baseUrl . sprintf('issues/%s?fields=project(id,name,shortName)', $taskId->toString());
                 $request = new Request($url, 'GET');
                 $request->setHeaders($this->headers);
@@ -132,7 +153,7 @@ final class YouTrackDestination implements Destination
 
         try {
             /** @var Response[] $responses */
-            $responses = await($features);
+            $responses = await($futures);
             foreach ($responses as $response) {
                 $body = $response->getBody()->buffer();
 
@@ -236,9 +257,9 @@ final class YouTrackDestination implements Destination
     /**
      * @throws DestinationException
      */
-    private function reportWorkItem(WorkItem $workItem): WorkItem
+    private function reportWorkItem(WorkItem $workItem): void
     {
-        // todo: добавить нормальную обработку ошибок
+        // todo: add normal error handling
 
         $body = [
             'duration' => [
@@ -264,14 +285,8 @@ final class YouTrackDestination implements Destination
                 $errorBody = $response->getBody()->buffer();
                 throw new RuntimeException(sprintf('Failed to report time: %d %s', $response->getStatus(), $errorBody));
             }
-
-            return $workItem;
         } catch (Throwable $e) {
-            throw new DestinationException(
-                sprintf('API Error for task %s: %s', $workItem->taskId->toString(), $e->getMessage()),
-                [],
-                $e,
-            );
+            throw new DestinationException($e->getMessage(), [], $e);
         }
     }
 }

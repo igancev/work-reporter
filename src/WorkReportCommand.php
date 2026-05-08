@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Igancev\WorkReporter;
 
 use DateTimeImmutable;
 use Igancev\WorkReporter\Config\ConfigException;
 use Igancev\WorkReporter\Config\ConfigProvider;
+use Igancev\WorkReporter\Destination\DeliveryEvent;
+use Igancev\WorkReporter\Destination\DeliveryStream;
 use Igancev\WorkReporter\Destination\Destination;
 use Igancev\WorkReporter\Destination\DestinationException;
 use Igancev\WorkReporter\Destination\DestinationFactory;
@@ -20,10 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\intro;
-use function Laravel\Prompts\table;
 use function Laravel\Prompts\title;
-use function Laravel\Prompts\warning;
 
 #[AsCommand(
     name: 'work:report',
@@ -109,6 +110,25 @@ class WorkReportCommand extends Command
         $this->minDuration = $this->parseMinDuration($input->getOption('min-duration'));
     }
 
+    private function parseDate(string $dateStr): DateTimeImmutable
+    {
+        $date = DateTimeImmutable::createFromFormat('Y-m-d', $dateStr);
+        if (!$date || $date->format('Y-m-d') !== $dateStr) {
+            throw new InvalidArgumentException(sprintf('Invalid date format: "%s". Expected YYYY-MM-DD.', $dateStr));
+        }
+
+        return $date->setTime(0, 0);
+    }
+
+    private function parseMinDuration(string $value): Duration
+    {
+        if ($value === '') {
+            return Duration::fromString('1m');
+        }
+
+        return Duration::fromString($value);
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         title('Work Reporter');
@@ -131,11 +151,11 @@ class WorkReportCommand extends Command
         }
 
         if (empty($timeEntries)) {
-            warning("No time entries found in the source: \"{$config->source->value}\"");
+            $this->io->warning("No time entries found in the source: \"{$config->source->value}\"");
             return Command::SUCCESS;
         }
 
-        $timeEntries = $this->filterByMinDuration((array) $timeEntries);
+        $timeEntries = $this->filterByMinDuration((array)$timeEntries);
 
         if (empty($timeEntries)) {
             $this->io->warning('No time entries remain after filtering by minimum duration.');
@@ -147,7 +167,8 @@ class WorkReportCommand extends Command
 
         $this->displayTimeEntries($finalTimeEntries);
 
-        $shouldSend = $input->getOption('yes') || confirm('Do you want to send these time entries to YouTrack?');
+        $shouldSend = $input->getOption('yes') ||
+            confirm("Do you want to send these time entries to {$config->destination->value}?");
 
         if (!$shouldSend) {
             $this->io->note('Sending cancelled.');
@@ -157,14 +178,19 @@ class WorkReportCommand extends Command
         return $this->sendToDestination($finalTimeEntries);
     }
 
-    private function parseDate(string $dateStr): DateTimeImmutable
+    /**
+     * @param TimeEntry[] $timeEntries
+     * @return TimeEntry[]
+     */
+    private function filterByMinDuration(array $timeEntries): array
     {
-        $date = DateTimeImmutable::createFromFormat('Y-m-d', $dateStr);
-        if (!$date || $date->format('Y-m-d') !== $dateStr) {
-            throw new InvalidArgumentException(sprintf('Invalid date format: "%s". Expected YYYY-MM-DD.', $dateStr));
-        }
-
-        return $date->setTime(0, 0);
+        return array_values(
+            array_filter(
+                $timeEntries,
+                fn(TimeEntry $entry) => $entry->duration->isGreaterThan($this->minDuration)
+                    || $entry->duration->equals($this->minDuration)
+            )
+        );
     }
 
     /**
@@ -179,7 +205,7 @@ class WorkReportCommand extends Command
         }
 
         foreach ($entriesByDate as $date => $entries) {
-            intro("Date: $date");
+            $this->io->section("Date: $date");
             $tableData = [];
             $totalDuration = Duration::fromMinutes(0);
 
@@ -188,14 +214,13 @@ class WorkReportCommand extends Command
                     $entry->taskId,
                     $entry->duration->toString(),
                     $entry->workType,
-                    $entry->date->format('Y-m-d'),
                     $entry->comment,
                 ];
                 $totalDuration = $totalDuration->add($entry->duration);
             }
 
-            table(
-                ['Task ID', 'Duration', 'Work Type', 'Date', 'Comment'],
+            $this->io->table(
+                ['Task ID', 'Duration', 'Work Type', 'Comment'],
                 $tableData
             );
 
@@ -219,79 +244,78 @@ class WorkReportCommand extends Command
      */
     private function sendToDestination(array $finalTimeEntries): int
     {
-        $this->io->title('Sending Time Entries');
-        $this->io->text(sprintf('Sending %d time entries...', count($finalTimeEntries)));
+        $destination = $this->destination;
+        /** @var DeliveryEvent[] $successEvents */
+        $successEvents = [];
+        /** @var DeliveryEvent[] $failureEvents */
+        $failureEvents = [];
+        $deliveryException = null;
+
+        $this->io->section(sprintf('Sending %d time entries...', count($finalTimeEntries)));
+
+        $startTime = hrtime(true);
 
         try {
-            $deliveryResult = $this->destination->logTimeEntries($finalTimeEntries);
+            /** @var DeliveryStream<DeliveryEvent> $stream */
+            $stream = $destination->logTimeEntries($finalTimeEntries);
+
+            /** @var DeliveryEvent $event */
+            foreach ($stream as $event) {
+                if ($event->success) {
+                    $successEvents[] = $event;
+                    $this->io->writeln(sprintf(
+                        ' <info>✔</info> %s %s %s (%s) — delivered (%.0fms)',
+                        $event->timeEntry->date->format('Y-m-d'),
+                        $event->timeEntry->taskId,
+                        $event->timeEntry->duration->toString(),
+                        $event->timeEntry->workType,
+                        $event->durationMs,
+                    ));
+                } else {
+                    $failureEvents[] = $event;
+                    $this->io->writeln(sprintf(
+                        ' <error>✘</error> %s %s %s (%s) — %s (%.0fms)',
+                        $event->timeEntry->date->format('Y-m-d'),
+                        $event->timeEntry->taskId,
+                        $event->timeEntry->duration->toString(),
+                        $event->timeEntry->workType,
+                        $event->error?->getMessage() ?? 'unknown error',
+                        $event->durationMs,
+                    ));
+                }
+            }
         } catch (DestinationException $e) {
+            $deliveryException = $e;
+        }
+
+        $elapsedMs = (hrtime(true) - $startTime) / 1_000_000;
+        $this->io->writeln(sprintf(' Total time: <comment>%.0fms</comment>', $elapsedMs));
+        $this->io->newLine();
+
+        if ($deliveryException !== null) {
             $this->io->section('Delivery Failed');
-            $this->io->error($e->getMessage());
+            $this->io->error($deliveryException->getMessage());
             return Command::FAILURE;
         }
 
-        if ($deliveryResult->isSuccessful()) {
+        if (count($failureEvents) === 0) {
             $this->io->success(
-                sprintf('All %d time entries imported successfully!', $deliveryResult->successfulCount())
+                sprintf('All %d time entries imported successfully!', count($successEvents))
             );
             return Command::SUCCESS;
         }
 
         // print partial success entries
-        if ($deliveryResult->successfulCount() > 0) {
-            $this->io->section('Partial Success');
-            $this->io->note(sprintf('Successfully imported %d entries.', $deliveryResult->successfulCount()));
-
-            $successfulData = [];
-            foreach ($deliveryResult->successDelivered() as $success) {
-                $successfulData[] = [
-                    $success->taskId,
-                    $success->date->format('Y-m-d'),
-                    $success->duration->toString(),
-                ];
-            }
-            $this->io->table(['Task ID', 'Date', 'Duration'], $successfulData);
+        if (count($successEvents) > 0) {
+            $this->io->warning(
+                sprintf(
+                    'Partially completed: %d of %d entries were imported successfully.',
+                    count($successEvents),
+                    count($finalTimeEntries),
+                )
+            );
         }
-
-        // print failures
-        $this->io->section('Failures');
-        $this->io->error(sprintf('Failed to import %d entries:', $deliveryResult->failuresCount()));
-
-        $failureData = [];
-        foreach ($deliveryResult->failures() as $failure) {
-            $failureData[] = [
-                $failure->timeEntry->taskId,
-                $failure->timeEntry->date->format('Y-m-d'),
-                $failure->timeEntry->duration->toString(),
-                $failure->exception->getMessage(),
-            ];
-        }
-        $this->io->table(['Task ID', 'Date', 'Duration', 'Error'], $failureData);
 
         return Command::FAILURE;
-    }
-
-    private function parseMinDuration(string $value): Duration
-    {
-        if ($value === '') {
-            return Duration::fromString('1m');
-        }
-
-        return Duration::fromString($value);
-    }
-
-    /**
-     * @param TimeEntry[] $timeEntries
-     * @return TimeEntry[]
-     */
-    private function filterByMinDuration(array $timeEntries): array
-    {
-        return array_values(
-            array_filter(
-                $timeEntries,
-                fn(TimeEntry $entry) => $entry->duration->isGreaterThan($this->minDuration)
-                    || $entry->duration->equals($this->minDuration)
-            )
-        );
     }
 }

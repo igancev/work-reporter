@@ -5,6 +5,7 @@ check-all:
 	make cs
 	make stat-analyze
 	make unit
+	make functional
 
 cs:
 	composer cs
@@ -17,6 +18,9 @@ stat-analyze:
 
 unit:
 	composer unit
+
+functional:
+	composer functional
 
 build-binary:
 	bash build-binary.sh

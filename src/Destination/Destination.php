@@ -13,7 +13,8 @@ interface Destination
 {
     /**
      * @param iterable<TimeEntry> $timeEntries
+     * @return DeliveryStream<DeliveryEvent>
      * @throws DestinationException
      */
-    public function logTimeEntries(iterable $timeEntries): BatchDeliveryResult;
+    public function logTimeEntries(iterable $timeEntries): DeliveryStream;
 }
