@@ -131,13 +131,14 @@ composer install
 
 #### Commands
 
-| Command | Description |
-|---|---|
-| `make cs` | Check code style (PSR-12) |
-| `make cs-fix` | Auto-fix code style |
+| Command             | Description               |
+|---------------------|---------------------------|
+| `make cs`           | Check code style (PSR-12) |
+| `make cs-fix`       | Auto-fix code style       |
 | `make stat-analyze` | Static analysis (PHPStan) |
-| `make unit` | Run tests |
-| `make check-all` | Run all checks |
+| `make unit`         | Run unit tests            |
+| `make functional`   | Run functional tests      |
+| `make check-all`    | Run all checks            |
 
 ---
 
