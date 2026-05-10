@@ -189,7 +189,7 @@ final class YouTrackDestination implements Destination
             }
         } catch (HttpException $e) {
             throw new DestinationException(
-                'Failed to fetch projects from destination: ' . $e->getMessage(),
+                'Failed to fetch projects from Youtrack: ' . $e->getMessage(),
                 ['url' => $this->url],
                 $e,
             );

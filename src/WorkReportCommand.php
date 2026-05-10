@@ -293,7 +293,6 @@ class WorkReportCommand extends Command
         $this->io->newLine();
 
         if ($deliveryException !== null) {
-            $this->io->section('Delivery Failed');
             $this->io->error($deliveryException->getMessage());
             return Command::FAILURE;
         }
