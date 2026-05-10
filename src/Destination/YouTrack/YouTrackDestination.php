@@ -159,7 +159,8 @@ final class YouTrackDestination implements Destination
 
                 // todo: make error catch: 404 etc.
                 if ($response->getStatus() >= 400) {
-                    $projects = implode(', ',
+                    $projects = implode(
+                        ', ',
                         array_map(fn(TaskId $taskId) => $taskId->getProjectAlias(), $taskIdsUniqueByProject)
                     );
                     throw new DestinationException(

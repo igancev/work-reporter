@@ -212,7 +212,7 @@ final class YouTrackDestinationTest extends TestCase
 
         // Assert
         $this->expectException(DestinationException::class);
-        $this->expectExceptionMessage('Failed to fetch projects from destination: Network Error');
+        $this->expectExceptionMessage('Failed to fetch projects from Youtrack: Network Error');
 
         // Act
         $this->destination->logTimeEntries([$entry]);
