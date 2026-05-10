@@ -123,7 +123,7 @@ final class YouTrackDestinationTest extends TestCase
 
         // Assert
         $this->expectException(DestinationException::class);
-        $this->expectExceptionMessage('Failed to fetch data from destination');
+        $this->expectExceptionMessage('Failed to fetch data from YouTrack');
 
         // Act
         $this->destination->logTimeEntries([$entry]);
