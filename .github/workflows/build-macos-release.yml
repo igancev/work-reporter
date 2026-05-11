@@ -10,7 +10,10 @@ jobs:
   build-macos:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Extract version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
 
@@ -18,7 +21,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          extensions: mbstring, xml, curl, sockets
           tools: box, composer
+          coverage: none
 
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader --ignore-platform-reqs
@@ -28,22 +33,38 @@ jobs:
 
       - name: Download and setup SPC
         run: |
-          curl -L https://github.com/crazywhalecc/static-php-cli/releases/latest/download/spc-macos-aarch64.tar.gz -o spc.tar.gz
-          tar -xzf spc.tar.gz
+          curl -fsSL -o spc https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-macos-aarch64
           chmod +x spc
 
-      - name: Build micro.sfx
+      - name: Download required PHP extensions
         run: |
-          ./spc download --with-php=8.4 --for-extensions="ctype,curl,dom,filter,libxml,mbstring,openssl,phar,simplexml,sockets,tokenizer,xml"
-          ./spc build "ctype,curl,dom,filter,libxml,mbstring,openssl,phar,simplexml,sockets,tokenizer,xml" --build-micro
+          export SPC_SKIP_BREW_INSTALL=1
+          ./spc download micro --for-extensions=ctype,curl,dom,filter,libxml,mbstring,openssl,phar,simplexml,sockets,tokenizer,xml --with-php=8.4 --prefer-pre-built
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify environment is ready
+        run: |
+          export SPC_SKIP_BREW_INSTALL=1
+          ./spc doctor --auto-fix
 
       - name: Build PHAR
         run: box compile
+
+      - name: Build the self-executable binary
+        run: |
+          export SPC_SKIP_BREW_INSTALL=1
+          ./spc build "ctype,curl,dom,filter,libxml,mbstring,openssl,phar,simplexml,sockets,tokenizer,xml" --build-micro
 
       - name: Combine binary
         run: |
           mkdir -p dist
           ./spc micro:combine .build/phar/work-reporter.phar --output=dist/work-reporter-${{ env.VERSION }}-darwin-arm64
+
+      - name: Test binary
+        run: |
+          chmod +x dist/work-reporter-${{ env.VERSION }}-darwin-arm64
+          dist/work-reporter-${{ env.VERSION }}-darwin-arm64 --version
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
