@@ -30,7 +30,9 @@ At work, you need to log time spent on tasks. Throughout the day you switch betw
 
 ---
 
-### 📦 Installation (Linux)
+### 📦 Installation
+
+#### Linux (amd64)
 
 One-liner install — download the latest binary and you're ready to go:
 
@@ -38,7 +40,13 @@ One-liner install — download the latest binary and you're ready to go:
 curl -sL "$(curl -s https://api.github.com/repos/igancev/work-reporter/releases/latest | grep -oP '"browser_download_url":\s*"\K[^"]*linux-amd64')" -o work-reporter && chmod +x work-reporter && sudo mv work-reporter /usr/local/bin/
 ```
 
-Verify the installation:
+#### macOS (Apple Silicon)
+
+```bash
+curl -sL "$(curl -s https://api.github.com/repos/igancev/work-reporter/releases/latest | grep -o '"browser_download_url":[^"]*"[^"]*darwin-arm64[^"]*"' | cut -d'"' -f4)" -o work-reporter && chmod +x work-reporter && sudo mv work-reporter /usr/local/bin/
+```
+
+#### Verify the installation
 
 ```bash
 work-reporter --version
