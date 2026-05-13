@@ -32,18 +32,18 @@ At work, you need to log time spent on tasks. Throughout the day you switch betw
 
 ### 📦 Installation
 
-#### Linux (amd64)
-
 One-liner install — download the latest binary and you're ready to go:
 
+#### Linux (amd64)
+
 ```bash
-curl -sL "$(curl -s https://api.github.com/repos/igancev/work-reporter/releases/latest | grep -oP '"browser_download_url":\s*"\K[^"]*linux-amd64')" -o work-reporter && chmod +x work-reporter && sudo mv work-reporter /usr/local/bin/
+echo "⬇  Downloading work-reporter..." && curl -#L "$(curl -s https://api.github.com/repos/igancev/work-reporter/releases/latest | grep -oP '"browser_download_url":\s*"\K[^"]*linux-amd64')" -o work-reporter && echo "📦 Installing to /usr/local/bin..." && chmod +x work-reporter && sudo mv work-reporter /usr/local/bin/ && echo "✅ Done. Run: work-reporter --version"
 ```
 
 #### macOS (Apple Silicon)
 
 ```bash
-curl -sL "$(curl -s https://api.github.com/repos/igancev/work-reporter/releases/latest | grep -o '"browser_download_url":[^"]*"[^"]*darwin-arm64[^"]*"' | cut -d'"' -f4)" -o work-reporter && chmod +x work-reporter && sudo mv work-reporter /usr/local/bin/
+echo "⬇  Downloading work-reporter..." && curl -#L "$(curl -s https://api.github.com/repos/igancev/work-reporter/releases/latest | grep -o '"browser_download_url":[^"]*"[^"]*darwin-arm64[^"]*"' | cut -d'"' -f4)" -o work-reporter && echo "📦 Installing to /usr/local/bin..." && chmod +x work-reporter && sudo mv work-reporter /usr/local/bin/ && echo "✅ Done. Run: work-reporter --version"
 ```
 
 #### Verify the installation
