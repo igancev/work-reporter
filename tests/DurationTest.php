@@ -198,7 +198,7 @@ final class DurationTest extends TestCase
             'only space' => [' '],
             'mixed unit and naked number' => ['1h 30'],
             'too large value (overflow)' => [(string) PHP_INT_MAX],
-            'overflow boundary with unit' => [(string) (intdiv(PHP_INT_MAX, 60000) + 1) . 'm'],
+            'overflow boundary with unit' => [intdiv(PHP_INT_MAX, 60000) + 1 . 'm'],
         ];
     }
 }
