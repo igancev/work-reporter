@@ -24,7 +24,6 @@ use Igancev\WorkReporter\Source\TimeEntriesSource;
 use Igancev\WorkReporter\Source\TimeEntriesSourceFactory;
 use Igancev\WorkReporter\TimeEntry;
 use Igancev\WorkReporter\WorkReportCommand;
-use InvalidArgumentException;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\Prompt;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -78,14 +77,18 @@ final class WorkReportCommandTest extends TestCase
         ConfirmPrompt::fallbackUsing(fn() => true); // reset to default if needed
     }
 
-    public function testInvalidDateFormatThrowsException(): void
+    public function testInvalidFromDatePrintFormattedError(): void
     {
-        // Assert
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid date format: "invalid-date". Expected YYYY-MM-DD.');
-
         // Act
         $this->tester->execute(['--from' => 'invalid-date']);
+
+        // Assert
+        $this->assertSame(Command::FAILURE, $this->tester->getStatusCode());
+        $display = $this->tester->getDisplay();
+        $this->assertStringContainsString(
+            '[ERROR] Invalid date format: "invalid-date". Expected YYYY-MM-DD.',
+            $display,
+        );
     }
 
     public function testDefaultDatesAreToday(): void
@@ -314,14 +317,15 @@ final class WorkReportCommandTest extends TestCase
         $this->assertStringContainsString('Api Error', $display);
     }
 
-    public function testInvalidToDateFormatThrowsException(): void
+    public function testInvalidToDatePrintFormattedError(): void
     {
-        // Assert
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid date format: "31-12-2026". Expected YYYY-MM-DD.');
-
         // Act
         $this->tester->execute(['--to' => '31-12-2026']);
+
+        // Assert
+        $this->assertSame(Command::FAILURE, $this->tester->getStatusCode());
+        $display = $this->tester->getDisplay();
+        $this->assertStringContainsString('[ERROR] Invalid date format: "31-12-2026". Expected YYYY-MM-DD.', $display);
     }
 
     public function testFilterByMinDurationBoundaryEqual(): void
@@ -387,24 +391,15 @@ final class WorkReportCommandTest extends TestCase
         $this->assertStringContainsString('T2', $display);
     }
 
-    public function testInvalidDailyGoalParsedAsZero(): void
+    public function testInvalidDailyGoalPrintFormattedError(): void
     {
-        // Arrange
-        $date = new DateTimeImmutable('2026-01-01');
-        $entry = new TimeEntry('T1', Duration::fromString('1h'), 'Dev', $date);
-        $this->source->method('fetchTimeEntries')->willReturn([$entry]);
-
         // Act
-        // Force "No" answer for confirm()
-        ConfirmPrompt::fallbackUsing(fn() => false);
-        Prompt::fallbackWhen(true);
         $this->tester->execute(['--daily-goal' => 'abc']);
 
         // Assert
-        // 1h >= 0m goal, so the total should be displayed with info tag (not error)
+        $this->assertSame(Command::FAILURE, $this->tester->getStatusCode());
         $display = $this->tester->getDisplay();
-        $this->assertStringContainsString('Total for 2026-01-01:', $display);
-        $this->assertStringContainsString('1h', $display);
+        $this->assertStringContainsString('[ERROR] Invalid duration format: "abc"', $display);
     }
 
     public function testDestinationExceptionReturnsFailure(): void
