@@ -25,6 +25,28 @@ final readonly class Duration
         return new self($ms);
     }
 
+    public static function fromMinutes(int $minutes): self
+    {
+        return new self($minutes * 60000);
+    }
+
+    public static function fromString(string $duration): self
+    {
+        $minutes = 0;
+        if (preg_match('/(\d+)h/i', $duration, $matches)) {
+            $minutes += (int)$matches[1] * 60;
+        }
+        if (preg_match('/(\d+)m/i', $duration, $matches)) {
+            $minutes += (int)$matches[1];
+        }
+
+        if ($minutes === 0 && is_numeric($duration)) {
+            $minutes = (int)$duration;
+        }
+
+        return self::fromMilliseconds($minutes * 60000);
+    }
+
     public function toString(): string
     {
         return $this->duration;
@@ -58,28 +80,6 @@ final readonly class Duration
     public function add(self $other): self
     {
         return new self($this->milliseconds + $other->milliseconds);
-    }
-
-    public static function fromMinutes(int $minutes): self
-    {
-        return new self($minutes * 60000);
-    }
-
-    public static function fromString(string $duration): self
-    {
-        $minutes = 0;
-        if (preg_match('/(\d+)h/i', $duration, $matches)) {
-            $minutes += (int)$matches[1] * 60;
-        }
-        if (preg_match('/(\d+)m/i', $duration, $matches)) {
-            $minutes += (int)$matches[1];
-        }
-
-        if ($minutes === 0 && is_numeric($duration)) {
-            $minutes = (int)$duration;
-        }
-
-        return self::fromMilliseconds($minutes * 60000);
     }
 
     private function calculateDuration(): string
