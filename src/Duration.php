@@ -6,6 +6,17 @@ namespace Igancev\WorkReporter;
 
 use InvalidArgumentException;
 
+/**
+ * Represents a time duration.
+ *
+ * Supported string formats:
+ * - "1h 30m" (hours and minutes)
+ * - "2h" (hours only)
+ * - "45m" (minutes only)
+ * - "90" (numeric string, interpreted as minutes)
+ *
+ * Use static factories for creation: fromMilliseconds(), fromMinutes(), or fromString().
+ */
 final readonly class Duration
 {
     private string $duration;
