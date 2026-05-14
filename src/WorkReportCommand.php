@@ -102,35 +102,22 @@ class WorkReportCommand extends Command
     {
         parent::initialize($input, $output);
         $this->io = new SymfonyStyle($input, $output);
-
-        $this->from = $this->parseDate($input->getOption('from'));
-        $this->to = $this->parseDate($input->getOption('to'));
-        $this->isGrouped = (bool)$input->getOption('group');
-        $this->dailyGoal = Duration::fromString($input->getOption('daily-goal'));
-        $this->minDuration = $this->parseMinDuration($input->getOption('min-duration'));
-    }
-
-    private function parseDate(string $dateStr): DateTimeImmutable
-    {
-        $date = DateTimeImmutable::createFromFormat('Y-m-d', $dateStr);
-        if (!$date || $date->format('Y-m-d') !== $dateStr) {
-            throw new InvalidArgumentException(sprintf('Invalid date format: "%s". Expected YYYY-MM-DD.', $dateStr));
-        }
-
-        return $date->setTime(0, 0);
-    }
-
-    private function parseMinDuration(string $value): Duration
-    {
-        if ($value === '') {
-            return Duration::fromString('1m');
-        }
-
-        return Duration::fromString($value);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->isGrouped = (bool)$input->getOption('group');
+
+        try {
+            $this->from = $this->parseDate($input->getOption('from'));
+            $this->to = $this->parseDate($input->getOption('to'));
+            $this->dailyGoal = Duration::fromString($input->getOption('daily-goal'));
+            $this->minDuration = $this->parseMinDuration($input->getOption('min-duration'));
+        } catch (InvalidDurationException | InvalidArgumentException $e) {
+            $this->io->error($e->getMessage());
+            return Command::FAILURE;
+        }
+
         title('Work Reporter');
 
         try {
@@ -176,6 +163,28 @@ class WorkReportCommand extends Command
         }
 
         return $this->sendToDestination($finalTimeEntries);
+    }
+
+    private function parseDate(string $dateStr): DateTimeImmutable
+    {
+        $date = DateTimeImmutable::createFromFormat('Y-m-d', $dateStr);
+        if (!$date || $date->format('Y-m-d') !== $dateStr) {
+            throw new InvalidArgumentException(sprintf('Invalid date format: "%s". Expected YYYY-MM-DD.', $dateStr));
+        }
+
+        return $date->setTime(0, 0);
+    }
+
+    /**
+     * @throws InvalidDurationException
+     */
+    private function parseMinDuration(string $value): Duration
+    {
+        if ($value === '') {
+            return Duration::fromString('1m');
+        }
+
+        return Duration::fromString($value);
     }
 
     /**

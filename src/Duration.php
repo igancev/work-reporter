@@ -6,6 +6,17 @@ namespace Igancev\WorkReporter;
 
 use InvalidArgumentException;
 
+/**
+ * Represents a time duration.
+ *
+ * Supported string formats:
+ * - "1h 30m" (hours and minutes)
+ * - "2h" (hours only)
+ * - "45m" (minutes only)
+ * - "90" (numeric string, interpreted as minutes)
+ *
+ * Use static factories for creation: fromMilliseconds(), fromMinutes(), or fromString().
+ */
 final readonly class Duration
 {
     private string $duration;
@@ -23,6 +34,52 @@ final readonly class Duration
     public static function fromMilliseconds(int $ms): self
     {
         return new self($ms);
+    }
+
+    public static function fromMinutes(int $minutes): self
+    {
+        return new self($minutes * 60000);
+    }
+
+    /**
+     * @throws InvalidDurationException
+     */
+    public static function fromString(string $duration): self
+    {
+        $input = trim($duration);
+        if ($input === '') {
+            throw InvalidDurationException::forInput($duration, 'String cannot be empty');
+        }
+
+        if (ctype_digit($input)) {
+            $minutes = (int)$input;
+            if ($minutes > (PHP_INT_MAX / 60000)) {
+                throw InvalidDurationException::forInput($duration, 'Value is too large');
+            }
+            return self::fromMinutes($minutes);
+        }
+
+        if (!preg_match('/^(?:\d+[hm]\s*)+$/i', $input)) {
+            throw InvalidDurationException::forInput(
+                $duration,
+                'Expected format: "1h 30m", "2h", "45m", or a number',
+            );
+        }
+
+        preg_match_all('/(\d+)([hm])/i', $input, $matches, PREG_SET_ORDER);
+
+        $minutes = 0;
+        foreach ($matches as $match) {
+            $minutes += strtolower($match[2]) === 'h'
+                ? (int)$match[1] * 60
+                : (int)$match[1];
+        }
+
+        if ($minutes > (PHP_INT_MAX / 60000)) {
+            throw InvalidDurationException::forInput($duration, 'Value is too large');
+        }
+
+        return self::fromMinutes($minutes);
     }
 
     public function toString(): string
@@ -58,28 +115,6 @@ final readonly class Duration
     public function add(self $other): self
     {
         return new self($this->milliseconds + $other->milliseconds);
-    }
-
-    public static function fromMinutes(int $minutes): self
-    {
-        return new self($minutes * 60000);
-    }
-
-    public static function fromString(string $duration): self
-    {
-        $minutes = 0;
-        if (preg_match('/(\d+)h/i', $duration, $matches)) {
-            $minutes += (int)$matches[1] * 60;
-        }
-        if (preg_match('/(\d+)m/i', $duration, $matches)) {
-            $minutes += (int)$matches[1];
-        }
-
-        if ($minutes === 0 && is_numeric($duration)) {
-            $minutes = (int)$duration;
-        }
-
-        return self::fromMilliseconds($minutes * 60000);
     }
 
     private function calculateDuration(): string

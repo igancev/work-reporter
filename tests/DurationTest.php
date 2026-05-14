@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests;
 
 use Igancev\WorkReporter\Duration;
+use Igancev\WorkReporter\InvalidDurationException;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +29,7 @@ final class DurationTest extends TestCase
     public function testThrowsExceptionForNegativeMilliseconds(): void
     {
         // Assert
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Milliseconds must be positive');
 
         // Act
@@ -107,10 +109,11 @@ final class DurationTest extends TestCase
             'more than half minute (rounds to 1)' => [30001, 1],
             'one minute' => [60000, 1],
             'one hour' => [3600000, 60],
+            'large value' => [600_000_000, 10000],
         ];
     }
 
-    #[DataProvider('fromStringProvider')]
+    #[DataProvider('successFromStringProvider')]
     public function testFromString(string $input, int $expectedMs): void
     {
         // Act
@@ -123,7 +126,7 @@ final class DurationTest extends TestCase
     /**
      * @return array<string, array{string, int}>
      */
-    public static function fromStringProvider(): array
+    public static function successFromStringProvider(): array
     {
         return [
             'only minutes' => ['30m', 30 * 60000],
@@ -166,6 +169,36 @@ final class DurationTest extends TestCase
             'two hours' => [120 * 60000, '2h'],
             'complex value' => [3661000, '1h 1m'], // 3661000 ms = 61.016 minutes -> 61 minutes -> 1h 1m
             'rounding up to hour' => [3570000, '1h'], // 3,570,000 ms = 59.5 minutes -> 60 minutes -> 1h
+            'explicit 45m' => [45 * 60000, '45m'],
+            'large duration (24h)' => [86400000, '24h'],
+        ];
+    }
+
+    #[DataProvider('invalidStringProvider')]
+    public function testFromStringThrowsExceptionForInvalidInput(string $input): void
+    {
+        // Assert
+        $this->expectException(InvalidDurationException::class);
+
+        // Act
+        Duration::fromString($input);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function invalidStringProvider(): array
+    {
+        return [
+            'empty string' => [''],
+            'non-numeric junk' => ['abc'],
+            'malformed suffix' => ['1x'],
+            'partial malformed' => ['1h 2x'],
+            'negative minutes as string' => ['-10m'],
+            'only space' => [' '],
+            'mixed unit and naked number' => ['1h 30'],
+            'too large value (overflow)' => [(string) PHP_INT_MAX],
+            'overflow boundary with unit' => [intdiv(PHP_INT_MAX, 60000) + 1 . 'm'],
         ];
     }
 }
