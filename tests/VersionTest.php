@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Tests;
 
 use Igancev\WorkReporter\Version;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Version::class)]
 final class VersionTest extends TestCase
 {
     private string $tmpFile;
@@ -52,5 +54,16 @@ final class VersionTest extends TestCase
     {
         file_put_contents($this->tmpFile, (string) json_encode(['version' => '1.2.3']));
         self::assertSame('1.2.3', Version::fromFile($this->tmpFile));
+    }
+
+    public function testReturnsDefaultWhenFileCannotBeRead(): void
+    {
+        chmod($this->tmpFile, 0000);
+
+        try {
+            self::assertSame('dev', Version::fromFile($this->tmpFile));
+        } finally {
+            chmod($this->tmpFile, 0644);
+        }
     }
 }
