@@ -6,7 +6,7 @@ namespace Igancev\WorkReporter;
 
 final class Version
 {
-    public const DEFAULT = 'dev';
+    private const string DEFAULT = 'dev';
 
     public static function fromFile(string $path): string
     {
@@ -14,7 +14,7 @@ final class Version
             return self::DEFAULT;
         }
 
-        $contents = file_get_contents($path);
+        $contents = @file_get_contents($path);
         if ($contents === false) {
             return self::DEFAULT;
         }
