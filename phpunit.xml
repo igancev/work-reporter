@@ -21,9 +21,9 @@
         </include>
     </source>
 
-    <coverage includeUncoveredFiles="true">
-        <report>
-            <text outputFile="php://stdout" showUncoveredFiles="true"/>
-        </report>
-    </coverage>
+<!--    <coverage includeUncoveredFiles="true">-->
+<!--        <report>-->
+<!--            <text outputFile="php://stdout" showUncoveredFiles="true"/>-->
+<!--        </report>-->
+<!--    </coverage>-->
 </phpunit>
