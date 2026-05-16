@@ -30,7 +30,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          coverage: none
+          coverage: pcov
           tools: composer:v2
 
       - name: Install Composer dependencies
@@ -42,8 +42,12 @@ jobs:
       - name: Run PHPStan
         run: composer stat-analyze
 
-      - name: Run Unit tests
-        run: composer unit
+      - name: Run tests with coverage
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
-      - name: Run Functional tests
-        run: composer functional
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: coverage.xml
+          format: clover
+          fail-on-error: true

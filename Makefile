@@ -22,5 +22,8 @@ unit:
 functional:
 	composer functional
 
+coverage:
+	composer coverage
+
 build-binary:
 	bash build-binary.sh

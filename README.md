@@ -3,6 +3,7 @@
 > CLI tool for automatically reporting work time from local sources (time trackers) to task trackers.
 
 [![Build](https://github.com/igancev/work-reporter/actions/workflows/quality-checks.yaml/badge.svg)](https://github.com/igancev/work-reporter/actions)
+[![Coverage Status](https://coveralls.io/repos/github/igancev/work-reporter/badge.svg?branch=main)](https://coveralls.io/github/igancev/work-reporter?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 ---
