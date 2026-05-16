@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Destination\YouTrack;
+namespace Tests\Unit\Destination\YouTrack;
 
 use Igancev\WorkReporter\Destination\YouTrack\TaskId;
 use PHPUnit\Framework\Attributes\CoversClass;

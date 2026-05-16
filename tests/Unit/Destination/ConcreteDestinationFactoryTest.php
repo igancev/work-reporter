@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Destination;
+namespace Tests\Unit\Destination;
 
 use Igancev\WorkReporter\Config\Config;
 use Igancev\WorkReporter\Config\ConfigProvider;

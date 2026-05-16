@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Source\PlainJson;
+namespace Tests\Unit\Source\PlainJson;
 
 use DateTimeImmutable;
 use Igancev\WorkReporter\Duration;
@@ -19,7 +19,7 @@ class PlainJsonTimeEntriesSourceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->jsonFilePath = __DIR__ . '/../../../tests/data/jsonList/jsonList.json';
+        $this->jsonFilePath = __DIR__ . '/../../../data/jsonList/jsonList.json';
     }
 
     public function testFetchTimeEntriesSuccessfully(): void

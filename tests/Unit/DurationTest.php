@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Unit;
 
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\InvalidDurationException;

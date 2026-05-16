@@ -26,8 +26,8 @@
         "cs": "vendor/bin/phpcs -p",
         "cs-fix": "vendor/bin/phpcbf",
         "stat-analyze": "vendor/bin/phpstan analyse --memory-limit=512M",
-        "unit": "vendor/bin/phpunit",
-        "functional": "vendor/bin/phpunit --group functional"
+        "unit": "vendor/bin/phpunit --testsuite=unit",
+        "functional": "vendor/bin/phpunit --testsuite=functional"
     },
     "autoload": {
         "psr-4": {

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Source\SuperProductivity;
+namespace Tests\Unit\Source\SuperProductivity;
 
-use Igancev\WorkReporter\TimeEntry;
 use DateTimeImmutable;
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\Source\SuperProductivity\SuperProductivitySyncSource;
+use Igancev\WorkReporter\TimeEntry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class SuperProductivitySyncDataSourceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->metaFilePath = __DIR__ . '/../../data/superproductivity/__meta_';
+        $this->metaFilePath = __DIR__ . '/../../../data/superproductivity/__meta_';
     }
 
     public function testGetTimeEntries(): void

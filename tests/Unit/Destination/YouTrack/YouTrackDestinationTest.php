@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Destination\YouTrack;
+namespace Tests\Unit\Destination\YouTrack;
 
 use Amp\ByteStream\BufferException;
 use Amp\ByteStream\ReadableStream;

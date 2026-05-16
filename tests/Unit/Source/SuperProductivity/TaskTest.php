@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Source\SuperProductivity;
+namespace Tests\Unit\Source\SuperProductivity;
 
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\Source\SuperProductivity\Tag;
