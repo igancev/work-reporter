@@ -8,6 +8,7 @@ use ArrayIterator;
 use DateTimeImmutable;
 use Exception;
 use Igancev\WorkReporter\Config\Config;
+use Igancev\WorkReporter\Config\ConfigException;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Config\DestinationConfig\DestinationsConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SourcesConfig;
@@ -444,6 +445,27 @@ final class WorkReportCommandTest extends TestCase
         // Assert
         $this->assertSame(Command::SUCCESS, $status);
         $this->assertStringContainsString('All 1 time entries imported successfully!', $this->tester->getDisplay());
+    }
+
+    public function testConfigExceptionReturnsFailure(): void
+    {
+        // Arrange
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->method('get')->willThrowException(new ConfigException('Config error'));
+
+        $command = new WorkReportCommand(
+            $this->createStub(TimeEntriesSourceFactory::class),
+            $this->createStub(DestinationFactory::class),
+            $configProvider
+        );
+        $tester = new CommandTester($command);
+
+        // Act
+        $status = $tester->execute([]);
+
+        // Assert
+        $this->assertSame(Command::FAILURE, $status);
+        $this->assertStringContainsString('Config error', $tester->getDisplay());
     }
 
     /**
