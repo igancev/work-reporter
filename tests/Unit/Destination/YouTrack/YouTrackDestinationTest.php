@@ -15,6 +15,7 @@ use Amp\Http\InvalidHeaderException;
 use DateTimeImmutable;
 use Igancev\WorkReporter\Destination\DeliveryEvent;
 use Igancev\WorkReporter\Destination\DestinationException;
+use Igancev\WorkReporter\Destination\YouTrack\WorkItem;
 use Igancev\WorkReporter\Destination\YouTrack\YouTrackDestination;
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\TimeEntry;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(YouTrackDestination::class)]
+#[CoversClass(WorkItem::class)]
 final class YouTrackDestinationTest extends TestCase
 {
     private DelegateHttpClient&MockObject $httpClient;

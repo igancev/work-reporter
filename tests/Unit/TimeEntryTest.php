@@ -8,8 +8,10 @@ use DateTimeImmutable;
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\TimeEntry;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TimeEntry::class)]
 class TimeEntryTest extends TestCase
 {
     public function testWorkTypeCannotBeEmpty(): void

@@ -36,6 +36,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Traversable;
 
 #[CoversClass(WorkReportCommand::class)]
+#[CoversClass(DeliveryEvent::class)]
 #[AllowMockObjectsWithoutExpectations]
 final class WorkReportCommandTest extends TestCase
 {

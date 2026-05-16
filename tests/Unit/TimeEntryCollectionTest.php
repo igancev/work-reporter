@@ -8,8 +8,10 @@ use DateTimeImmutable;
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\TimeEntry;
 use Igancev\WorkReporter\TimeEntryCollection;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TimeEntryCollection::class)]
 class TimeEntryCollectionTest extends TestCase
 {
     public function testAllReturnsAllItems(): void
