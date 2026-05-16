@@ -7,16 +7,19 @@ namespace Tests\Functional;
 use Amp\Http\Client\HttpClientBuilder;
 use DateTimeImmutable;
 use Igancev\WorkReporter\Destination\DeliveryEvent;
+use Igancev\WorkReporter\Destination\PipelineDeliveryStream;
 use Igancev\WorkReporter\Destination\YouTrack\YouTrackDestination;
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\TimeEntry;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use Testcontainers\Container\GenericContainer;
 use Testcontainers\Container\StartedTestContainer;
 use Testcontainers\Wait\WaitForHttp;
 
-#[Group('functional')]
+#[CoversMethod(YouTrackDestination::class, 'logTimeEntries')]
+#[CoversClass(PipelineDeliveryStream::class)]
 class YouTrackDestinationTest extends TestCase
 {
     private StartedTestContainer $youtrackStartedContainer;

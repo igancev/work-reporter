@@ -6,12 +6,15 @@ namespace Tests\Unit;
 
 use Igancev\WorkReporter\Duration;
 use Igancev\WorkReporter\InvalidDurationException;
+use Igancev\WorkReporter\WorkReporterException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Duration::class)]
+#[CoversClass(WorkReporterException::class)]
+#[CoversClass(InvalidDurationException::class)]
 final class DurationTest extends TestCase
 {
     public function testFromMilliseconds(): void
@@ -181,7 +184,12 @@ final class DurationTest extends TestCase
         $this->expectException(InvalidDurationException::class);
 
         // Act
-        Duration::fromString($input);
+        try {
+            Duration::fromString($input);
+        } catch (InvalidDurationException $e) {
+            $this->assertSame(['input' => $input], $e->getContext());
+            throw $e;
+        }
     }
 
     /**

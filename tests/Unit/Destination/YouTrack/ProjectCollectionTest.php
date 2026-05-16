@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ProjectCollection::class)]
+#[CoversClass(Project::class)]
 final class ProjectCollectionTest extends TestCase
 {
     public function testGetProjects(): void
