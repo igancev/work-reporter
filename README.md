@@ -148,6 +148,11 @@ composer install
 | `make unit`         | Run unit tests            |
 | `make functional`   | Run functional tests      |
 | `make check-all`    | Run all checks            |
+| `make mutation`     | Mutation testing (Infection) |
+
+#### Mutation testing
+
+Mutation testing runs via [Infection](https://infection.github.io/) and is **not** part of `make check-all`. CI enforces a deliberately low threshold (`min-msi=40` and `min-covered-msi=40`) so that existing surviving mutants do not block development. Raise the thresholds in `.github/workflows/quality-checks.yaml` as test quality improves.
 
 ---
 

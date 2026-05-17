@@ -28,7 +28,8 @@
         "stat-analyze": "vendor/bin/phpstan analyse --memory-limit=512M",
         "unit": "vendor/bin/phpunit --testsuite=unit",
         "functional": "vendor/bin/phpunit --testsuite=functional",
-        "coverage": "vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-text"
+        "coverage": "vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-text",
+        "mutation": "vendor/bin/infection --threads=max --show-mutations --no-progress"
     },
     "autoload": {
         "psr-4": {
@@ -43,7 +44,8 @@
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "infection/extension-installer": true
         }
     },
     "require-dev": {
@@ -53,6 +55,7 @@
         "phpstan/phpstan": "^2.1",
         "testcontainers/testcontainers": "^1.0",
         "symfony/http-client": "^8.0",
-        "slevomat/coding-standard": "^8.28"
+        "slevomat/coding-standard": "^8.28",
+        "infection/infection": "^0.31"
     }
 }
