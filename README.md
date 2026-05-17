@@ -4,6 +4,7 @@
 
 [![Build](https://github.com/igancev/work-reporter/actions/workflows/quality-checks.yaml/badge.svg)](https://github.com/igancev/work-reporter/actions)
 [![Coverage Status](https://coveralls.io/repos/github/igancev/work-reporter/badge.svg?branch=main)](https://coveralls.io/github/igancev/work-reporter?branch=main)
+[![MSI](https://img.shields.io/badge/MSI-70%25-brightgreen)](https://github.com/igancev/work-reporter/actions/workflows/quality-checks.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -152,7 +153,7 @@ composer install
 
 #### Mutation testing
 
-Mutation testing runs via [Infection](https://infection.github.io/) and is **not** part of `make check-all`. CI enforces a deliberately low threshold (`min-msi=40` and `min-covered-msi=40`) so that existing surviving mutants do not block development. Raise the thresholds in `.github/workflows/quality-checks.yaml` as test quality improves.
+Mutation testing runs via [Infection](https://infection.github.io/) and is **not** part of `make check-all`. CI enforces a threshold (`min-msi=70` and `min-covered-msi=70`) to ensure test quality. Raise the thresholds in `.github/workflows/quality-checks.yaml` as test quality improves.
 
 ---
 
