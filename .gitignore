@@ -6,6 +6,8 @@
 /.build/
 /dist/
 /version.json
+/var/infection.*
+/.infection.cache/
 
 # llm
 /.claude/settings.local.json

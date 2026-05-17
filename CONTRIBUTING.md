@@ -50,6 +50,7 @@ for the authoritative, up-to-date list) includes:
 | Static analysis    | `composer stat-analyze`| PHPStan checks                   |
 | Unit tests         | `composer unit`        | Fast, isolated unit tests        |
 | Functional tests   | `composer functional`  | End-to-end / integration tests   |
+| Mutation testing   | `make mutation`        | Test suite quality (Infection)   |
 
 > ⚠️ The list above may become outdated. **Always treat the CI workflow as the
 > source of truth** — if CI runs a check, your PR must pass it.
@@ -62,6 +63,33 @@ make check-all
 
 This executes code style, static analysis, and unit tests locally before you push.
 
+### 3. Mutation testing (Infection)
+
+Test coverage alone does not guarantee test *quality*. To verify that tests
+actually detect regressions, this project uses
+[Infection](https://infection.github.io/) — a mutation testing framework that
+introduces small changes ("mutants") into the source code and checks whether
+the test suite catches them.
+
+- **Configuration**: [`infection.json5`](infection.json5) — mutates everything
+  under `src/` and runs only the `unit` testsuite for speed.
+- **Reports**: written to `var/infection.log` (text) and `var/infection.html`
+  (HTML).
+- **Local command**: `make mutation` (or `composer mutation`).
+- **Not part of `make check-all`** — mutation testing is slower and is run
+  manually or in CI.
+- **CI thresholds**: the `mutation-testing` job enforces `--min-msi` and
+  `--min-covered-msi` (see
+  [`.github/workflows/quality-checks.yaml`](.github/workflows/quality-checks.yaml)
+  for the current values). A PR that lowers MSI below the threshold will fail
+  CI.
+- **Improving MSI**: when Infection reports an *escaped mutant*, treat it as a
+  signal that the corresponding test is missing or too weak. Add or tighten a
+  test rather than weakening the threshold.
+
+Thresholds are intentionally conservative today and should be **raised over
+time** as test quality improves.
+
 ---
 
 ## Pull Request Checklist
@@ -71,6 +99,8 @@ Before opening a PR, please verify:
 - [ ] New / changed behavior is covered by tests.
 - [ ] `make check-all` passes locally.
 - [ ] Functional tests pass: `composer functional`.
+- [ ] Mutation testing does not regress (`make mutation`) — run when touching
+      core logic.
 - [ ] The PR description explains the motivation and scope of the change.
 
 ---

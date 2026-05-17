@@ -25,5 +25,8 @@ functional:
 coverage:
 	composer coverage
 
+mutation:
+	composer mutation
+
 build-binary:
 	bash build-binary.sh

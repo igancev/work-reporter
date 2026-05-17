@@ -51,3 +51,31 @@ jobs:
           file: coverage.xml
           format: clover
           fail-on-error: true
+
+  mutation-testing:
+    runs-on: ubuntu-latest
+    name: Mutation testing
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Run Infection
+        run: vendor/bin/infection --threads=max --min-msi=40 --min-covered-msi=40 --logger-github --no-progress
+
+      - name: Upload Infection report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: infection-report
+          path: var/infection.*
+          if-no-files-found: ignore

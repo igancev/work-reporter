@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Run all: `make unit` or `vendor/bin/phpunit`
   - Run single test: `vendor/bin/phpunit tests/Path/To/Test.php`
   - Run single test method: `vendor/bin/phpunit --filter testMethodName tests/Path/To/Test.php`
+- **Mutation Testing**: `make mutation` (Infection, manual; not part of `make check-all`). CI enforces `min-msi=70` and `min-covered-msi=70`; raise these thresholds as test quality improves.
 - **Safety**: After any logical changes, always run `make check-all` to ensure code quality.
 
 ## Code Style & Conventions
