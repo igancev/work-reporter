@@ -24,7 +24,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\title;
 
 #[AsCommand(
     name: 'work:report',
@@ -118,7 +117,7 @@ class WorkReportCommand extends Command
             return Command::FAILURE;
         }
 
-        title('Work Reporter');
+        Banner::render($output);
 
         try {
             $config = $this->configProvider->get();
