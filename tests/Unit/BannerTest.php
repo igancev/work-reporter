@@ -108,4 +108,53 @@ final class BannerTest extends TestCase
         $this->assertTrue($hasBlue, 'Expected blue gradient colors for WORK');
         $this->assertTrue($hasPink, 'Expected pink gradient colors for REPORTER');
     }
+
+    public function testPlainReturnsExactBannerContent(): void
+    {
+        // Act
+        $lines = Banner::plain();
+
+        // Assert
+        $this->assertCount(3, $lines);
+        $this->assertSame(
+            '█   █ █▀█ █▀▄ █▄▀    █▀▄ █▀▀ █▀▄ █▀█ █▀▄ ▀█▀ █▀▀ █▀▄',
+            $lines[0],
+        );
+        $this->assertSame(
+            '█ █ █ █ █ █▄▀ ██  ▄▄ █▄▀ █▀  █▄▀ █ █ █▄▀  █  █▀  █▄▀',
+            $lines[1],
+        );
+        $this->assertSame(
+            '▀▀ ▀▀ ▀▀▀ ▀ ▀ ▀ ▀    ▀ ▀ ▀▀▀ ▀   ▀▀▀ ▀ ▀  ▀  ▀▀▀ ▀ ▀',
+            $lines[2],
+        );
+    }
+
+    public function testRenderOutputMatchesPlainTextStructure(): void
+    {
+        // Arrange
+        $output = new BufferedOutput();
+
+        // Act
+        Banner::render($output);
+
+        // Assert
+        $content = $output->fetch();
+        $outputLines = explode("\n", $content);
+
+        // First line should be empty (the leading writeln(''))
+        $this->assertSame('', $outputLines[0], 'Render output should start with an empty line');
+
+        // Strip ANSI codes from banner lines and compare with plain() text
+        $plainLines = Banner::plain();
+        $strippedBannerLines = [];
+        for ($i = 1; $i <= count($plainLines); $i++) {
+            $stripped = preg_replace('/\033(?:\[[0-9;]*m|\]8;;[^\033]*\033\\\\)/', '', $outputLines[$i]);
+            $strippedBannerLines[] = $stripped;
+        }
+
+        foreach ($plainLines as $idx => $expected) {
+            $this->assertSame($expected, $strippedBannerLines[$idx]);
+        }
+    }
 }
