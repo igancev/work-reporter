@@ -30,8 +30,9 @@ final class Banner
     private const array WORK_END_RGB = [104, 159, 241];
     private const array REPORTER_START_RGB = [251, 67, 251];
     private const array REPORTER_END_RGB = [251, 64, 109];
+    private const string REPO_URL = 'github.com/igancev/work-reporter';
 
-    public static function render(OutputInterface $output): void
+    public static function render(OutputInterface $output, string $version = 'dev'): void
     {
         $output->writeln('');
 
@@ -50,6 +51,8 @@ final class Banner
 
             $output->writeln($line . "\033[0m");
         }
+
+        self::renderTagline($output, $version);
     }
 
     /**
@@ -65,6 +68,35 @@ final class Banner
         }
 
         return $lines;
+    }
+
+    private static function renderTagline(OutputInterface $output, string $version): void
+    {
+        $bannerWidth = mb_strlen(self::WORK_LINES[0] . self::SEPARATOR_LINES[0] . self::REPORTER_LINES[0]);
+        $repoUrl = 'https://' . self::REPO_URL;
+        $ghLink = self::terminalLink('GitHub', $repoUrl);
+        $starLink = self::terminalLink('⭐ Please star us if you find it useful!', $repoUrl);
+
+        $lines = [
+            sprintf("\033[33mv%s\033[0m · Made with \033[91m❤\033[0m · %s", $version, $ghLink),
+            $starLink,
+        ];
+
+        foreach ($lines as $line) {
+            $visualWidth = mb_strlen(self::stripAnsi($line));
+            $pad = max(0, (int) floor(($bannerWidth - $visualWidth) / 2));
+            $output->writeln(str_repeat(' ', $pad) . $line);
+        }
+    }
+
+    private static function terminalLink(string $text, string $url): string
+    {
+        return "\033]8;;{$url}\033\\{$text}\033]8;;\033\\";
+    }
+
+    private static function stripAnsi(string $text): string
+    {
+        return (string) preg_replace('/\033(?:\[[0-9;]*m|\]8;;[^\033]*\033\\\\)/', '', $text);
     }
 
     /**

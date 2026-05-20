@@ -59,6 +59,23 @@ final class BannerTest extends TestCase
         $this->assertMatchesRegularExpression('/[█▀▄]/', $content);
     }
 
+    public function testRenderOutputContainsTagline(): void
+    {
+        // Arrange
+        $output = new BufferedOutput();
+
+        // Act
+        Banner::render($output, '1.2.3');
+
+        // Assert
+        $content = $output->fetch();
+        $this->assertStringContainsString('v1.2.3', $content);
+        $this->assertStringContainsString('GitHub', $content);
+        $this->assertStringContainsString('https://github.com/igancev/work-reporter', $content);
+        $this->assertStringContainsString('❤', $content);
+        $this->assertStringContainsString('Please star us if you find it useful', $content);
+    }
+
     public function testRenderContainsBothGradients(): void
     {
         // Arrange

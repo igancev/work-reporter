@@ -117,7 +117,7 @@ class WorkReportCommand extends Command
             return Command::FAILURE;
         }
 
-        Banner::render($output);
+        Banner::render($output, $this->getApplication()?->getVersion() ?? 'dev');
 
         try {
             $config = $this->configProvider->get();
