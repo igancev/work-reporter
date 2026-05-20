@@ -87,8 +87,7 @@ the test suite catches them.
   signal that the corresponding test is missing or too weak. Add or tighten a
   test rather than weakening the threshold.
 
-Thresholds are intentionally conservative today and should be **raised over
-time** as test quality improves.
+Thresholds should be **maintained or raised** over time as test quality improves.
 
 ---
 

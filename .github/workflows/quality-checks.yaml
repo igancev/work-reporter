@@ -70,7 +70,7 @@ jobs:
         uses: ramsey/composer-install@v3
 
       - name: Run Infection
-        run: vendor/bin/infection --threads=max --min-msi=40 --min-covered-msi=40 --logger-github --no-progress
+        run: vendor/bin/infection --threads=max --min-msi=70 --min-covered-msi=70 --logger-github --no-progress
 
       - name: Upload Infection report
         if: always()
