@@ -108,4 +108,40 @@ class TimeEntryCollectionTest extends TestCase
         $this->assertCount(1, $grouped);
         $this->assertEquals("- Work", $grouped[0]->comment);
     }
+
+    public function testConstructorAcceptsGenerator(): void
+    {
+        // Arrange
+        $date = new DateTimeImmutable('2023-01-01');
+        $generator = (function () use ($date): \Generator {
+            yield new TimeEntry('T1', Duration::fromMinutes(60), 'Dev', $date);
+            yield new TimeEntry('T2', Duration::fromMinutes(30), 'Meeting', $date);
+        })();
+
+        // Act
+        $collection = new TimeEntryCollection($generator);
+
+        // Assert
+        $this->assertCount(2, $collection->all());
+        $this->assertSame('T1', $collection->all()[0]->taskId);
+        $this->assertSame('T2', $collection->all()[1]->taskId);
+    }
+
+    public function testGroupedTrimsWhitespaceFromComments(): void
+    {
+        // Arrange
+        $date = new DateTimeImmutable('2023-01-01');
+        $entries = [
+            new TimeEntry('T1', Duration::fromMinutes(30), 'Dev', $date, '  spaced comment  '),
+        ];
+
+        $collection = new TimeEntryCollection($entries);
+
+        // Act
+        $grouped = $collection->grouped();
+
+        // Assert
+        $this->assertCount(1, $grouped);
+        $this->assertSame('- spaced comment', $grouped[0]->comment);
+    }
 }

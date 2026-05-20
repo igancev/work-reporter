@@ -113,6 +113,7 @@ final class DurationTest extends TestCase
             'one minute' => [60000, 1],
             'one hour' => [3600000, 60],
             'large value' => [600_000_000, 10000],
+            'value where /60000 and /59999 diverge' => [1_800_000_000, 30_000],
         ];
     }
 
@@ -142,6 +143,14 @@ final class DurationTest extends TestCase
             'zero hours' => ['0h', 0],
             'case insensitive' => ['1H 15M', 75 * 60000],
             'with extra spaces' => ['  2h   5m  ', 125 * 60000],
+            'numeric boundary (max safe minutes)' => [
+                (string) intdiv(PHP_INT_MAX, 60000),
+                intdiv(PHP_INT_MAX, 60000) * 60000,
+            ],
+            'unit boundary (max safe minutes)' => [
+                intdiv(PHP_INT_MAX, 60000) . 'm',
+                intdiv(PHP_INT_MAX, 60000) * 60000,
+            ],
         ];
     }
 
@@ -177,6 +186,21 @@ final class DurationTest extends TestCase
         ];
     }
 
+    public function testFromEmptyStringThrowsWithSpecificMessage(): void
+    {
+        // Act
+        try {
+            Duration::fromString('');
+            $this->fail('Expected InvalidDurationException was not thrown');
+        } catch (InvalidDurationException $e) {
+            // Assert
+            $this->assertSame(['input' => ''], $e->getContext());
+            $this->assertStringContainsString('String cannot be empty', $e->getMessage());
+            $this->assertStringStartsWith('Invalid duration format:', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+    }
+
     #[DataProvider('invalidStringProvider')]
     public function testFromStringThrowsExceptionForInvalidInput(string $input): void
     {
@@ -207,6 +231,7 @@ final class DurationTest extends TestCase
             'mixed unit and naked number' => ['1h 30'],
             'too large value (overflow)' => [(string) PHP_INT_MAX],
             'overflow boundary with unit' => [intdiv(PHP_INT_MAX, 60000) + 1 . 'm'],
+            'overflow boundary (just above max safe)' => [(string) (intdiv(PHP_INT_MAX, 60000) + 1)],
         ];
     }
 }

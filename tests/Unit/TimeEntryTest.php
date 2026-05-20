@@ -29,4 +29,19 @@ class TimeEntryTest extends TestCase
             comment: 'comment'
         );
     }
+
+    public function testWorkTypeCannotBeWhitespaceOnly(): void
+    {
+        // Assert
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Work type cannot be empty');
+
+        // Act
+        new TimeEntry(
+            taskId: 'TASK-1',
+            duration: Duration::fromString('1h'),
+            workType: '   ',
+            date: new DateTimeImmutable('2026-01-01'),
+        );
+    }
 }
