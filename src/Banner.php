@@ -50,7 +50,6 @@ final class Banner
 
             $output->writeln($line . "\033[0m");
         }
-
     }
 
     /**
