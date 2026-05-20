@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Igancev\WorkReporter;
+namespace Igancev\WorkReporter\Cli;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
