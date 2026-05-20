@@ -1,0 +1,19 @@
+# Work Reporter configuration file
+# Documentation: https://github.com/igancev/work-reporter
+
+# Source type: superProductivity | plainJson
+source: plainJson
+
+# Destination type: youTrack
+destination: youTrack
+
+sources:
+  plainJson:
+    filePath: /path/to/time-entries.json
+  # superProductivity:
+  #   syncFilePath: /path/to/sync-file.json
+
+destinations:
+  youTrack:
+    url: https://youtrack.example.com
+    token: your-api-token

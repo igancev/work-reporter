@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Igancev\WorkReporter;
+namespace Igancev\WorkReporter\Cli;
 
 use DateTimeImmutable;
 use Igancev\WorkReporter\Config\ConfigException;
@@ -12,8 +12,12 @@ use Igancev\WorkReporter\Destination\DeliveryStream;
 use Igancev\WorkReporter\Destination\Destination;
 use Igancev\WorkReporter\Destination\DestinationException;
 use Igancev\WorkReporter\Destination\DestinationFactory;
+use Igancev\WorkReporter\Duration;
+use Igancev\WorkReporter\InvalidDurationException;
 use Igancev\WorkReporter\Source\SourceException;
 use Igancev\WorkReporter\Source\TimeEntriesSourceFactory;
+use Igancev\WorkReporter\TimeEntry;
+use Igancev\WorkReporter\TimeEntryCollection;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

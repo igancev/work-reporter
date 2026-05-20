@@ -5,13 +5,13 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use Igancev\WorkReporter\Application;
+use Igancev\WorkReporter\Cli\Application;
+use Igancev\WorkReporter\Cli\InitCommand;
+use Igancev\WorkReporter\Cli\WorkReportCommand;
 use Igancev\WorkReporter\Config\YamlConfigProvider;
 use Igancev\WorkReporter\Destination\ConcreteDestinationFactory;
-use Igancev\WorkReporter\InitCommand;
 use Igancev\WorkReporter\Source\ConcreteSourceFactory;
 use Igancev\WorkReporter\Version;
-use Igancev\WorkReporter\WorkReportCommand;
 
 $configProvider = new YamlConfigProvider();
 $workReportCommand = new WorkReportCommand(
