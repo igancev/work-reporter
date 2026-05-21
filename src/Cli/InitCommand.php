@@ -18,21 +18,25 @@ class InitCommand extends Command
 # Work Reporter configuration file
 # Documentation: https://github.com/igancev/work-reporter
 
-# Source type: superProductivity | plainJson
-source: plainJson
+# Active Source type: superProductivity | plainJson
+source: superProductivity
 
-# Destination type: youTrack
+# Active Destination type: youTrack | somethingElse
 destination: youTrack
 
+# Configuration for each source type
 sources:
+  superProductivity:
+    syncFilePath: ~/.config/superproductivity/__meta_
   plainJson:
     filePath: /path/to/time-entries.json
-  # superProductivity:
-  #   syncFilePath: /path/to/sync-file.json
 
+# Configuration for each destination type
 destinations:
   youTrack:
+    # Your YouTrack instance URL
     url: https://youtrack.example.com
+    # Permanent token for authentication
     token: your-api-token
 YAML;
 
