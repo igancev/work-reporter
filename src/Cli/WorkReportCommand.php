@@ -124,14 +124,13 @@ class WorkReportCommand extends Command
         Banner::render($output, $this->getApplication()?->getVersion() ?? 'dev');
 
         try {
-            $config = $this->configProvider->get();
-        } catch (ConfigException $e) {
+            $config = $this->configProvider->getConfig();
+            $timeEntriesSource = $this->timeEntriesSourceFactory->build($config->source);
+            $this->destination = $this->destinationFactory->build($config->destination);
+        } catch (SourceException | DestinationException | ConfigException $e) {
             $this->io->error($e->getMessage());
             return Command::FAILURE;
         }
-
-        $timeEntriesSource = $this->timeEntriesSourceFactory->build($config->source);
-        $this->destination = $this->destinationFactory->build($config->destination);
 
         try {
             $timeEntries = $timeEntriesSource->fetchTimeEntries($this->from, $this->to);

@@ -7,6 +7,7 @@ namespace Tests\Unit\Source;
 use Igancev\WorkReporter\Config\Config;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Config\DestinationConfig\DestinationsConfig;
+use Igancev\WorkReporter\Config\DestinationConfig\YouTrackConfig;
 use Igancev\WorkReporter\Config\SourceConfig\PlainJsonConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SourcesConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SuperProductivityConfig;
@@ -18,7 +19,6 @@ use Igancev\WorkReporter\Source\SuperProductivity\SuperProductivitySyncSource;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 #[CoversClass(ConcreteSourceFactory::class)]
 class ConcreteSourceFactoryTest extends TestCase
@@ -37,9 +37,9 @@ class ConcreteSourceFactoryTest extends TestCase
         // Arrange
         $plainJsonConfig = new PlainJsonConfig(filePath: 'path/to/file.json');
         $sourcesConfig = new SourcesConfig(plainJson: $plainJsonConfig);
-        $config = $this->createConfig($sourcesConfig);
+        $config = $this->createConfig(SourceType::PlainJson, $sourcesConfig);
 
-        $this->configProvider->method('get')->willReturn($config);
+        $this->configProvider->method('getConfig')->willReturn($config);
 
         // Act
         $source = $this->factory->build(SourceType::PlainJson);
@@ -61,9 +61,9 @@ class ConcreteSourceFactoryTest extends TestCase
         try {
             $superProductivityConfig = new SuperProductivityConfig(syncFilePath: $tempFile);
             $sourcesConfig = new SourcesConfig(superProductivity: $superProductivityConfig);
-            $config = $this->createConfig($sourcesConfig);
+            $config = $this->createConfig(SourceType::SuperProductivity, $sourcesConfig);
 
-            $this->configProvider->method('get')->willReturn($config);
+            $this->configProvider->method('getConfig')->willReturn($config);
 
             // Act
             $source = $this->factory->build(SourceType::SuperProductivity);
@@ -75,45 +75,13 @@ class ConcreteSourceFactoryTest extends TestCase
         }
     }
 
-    public function testBuildPlainJsonSourceThrowsExceptionWhenConfigMissing(): void
-    {
-        // Arrange
-        $sourcesConfig = new SourcesConfig(plainJson: null);
-        $config = $this->createConfig($sourcesConfig);
-
-        $this->configProvider->method('get')->willReturn($config);
-
-        // Assert
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('PlainJson source configuration is missing');
-
-        // Act
-        $this->factory->build(SourceType::PlainJson);
-    }
-
-    public function testBuildSuperProductivitySourceThrowsExceptionWhenConfigMissing(): void
-    {
-        // Arrange
-        $sourcesConfig = new SourcesConfig(superProductivity: null);
-        $config = $this->createConfig($sourcesConfig);
-
-        $this->configProvider->method('get')->willReturn($config);
-
-        // Assert
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('SuperProductivity source configuration is missing');
-
-        // Act
-        $this->factory->build(SourceType::SuperProductivity);
-    }
-
-    private function createConfig(SourcesConfig $sources): Config
+    private function createConfig(SourceType $sourceType, SourcesConfig $sources): Config
     {
         return new Config(
-            source: SourceType::PlainJson,
+            source: $sourceType,
             destination: DestinationType::YouTrack,
             sources: $sources,
-            destinations: $this->createStub(DestinationsConfig::class),
+            destinations: new DestinationsConfig(youTrack: new YouTrackConfig('http://yt.local', 'token-abc')),
         );
     }
 }

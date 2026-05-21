@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Igancev\WorkReporter\Source\SuperProductivity;
 
+use Igancev\WorkReporter\Source\SourceException;
 use Igancev\WorkReporter\Source\TimeEntriesSource;
 use Igancev\WorkReporter\TimeEntry;
 use DateTimeImmutable;
@@ -13,6 +14,9 @@ final readonly class SuperProductivitySyncSource implements TimeEntriesSource
     private Storage $storage;
     private TaskFactory $taskFactory;
 
+    /**
+     * @throws SourceException
+     */
     public function __construct(
         string $syncMetaPath,
     ) {

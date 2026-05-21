@@ -38,7 +38,7 @@ final class YamlConfigProviderTest extends TestCase
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Configuration file not found at');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testParsesFullConfig(): void
@@ -59,7 +59,7 @@ destinations:
 YAML);
 
         $provider = new YamlConfigProvider($configPath);
-        $config = $provider->get();
+        $config = $provider->getConfig();
 
         $this->assertSame(SourceType::SuperProductivity, $config->source);
         $this->assertSame(DestinationType::YouTrack, $config->destination);
@@ -72,7 +72,7 @@ YAML);
         $this->assertSame('test-token-123', $config->destinations->youTrack->token);
     }
 
-    public function testParsesMinimalConfig(): void
+    public function testThrowsExceptionWhenDestinationNotConfigured(): void
     {
         $configPath = $this->tempDir . '/config.yaml';
         file_put_contents($configPath, <<<YAML
@@ -82,14 +82,11 @@ sources: []
 destinations: []
 YAML);
 
-        $provider = new YamlConfigProvider($configPath);
-        $config = $provider->get();
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Destination youTrack is not configured');
 
-        $this->assertSame(SourceType::PlainJson, $config->source);
-        $this->assertSame(DestinationType::YouTrack, $config->destination);
-        $this->assertNull($config->sources->superProductivity);
-        $this->assertNull($config->sources->plainJson);
-        $this->assertNull($config->destinations->youTrack);
+        $provider = new YamlConfigProvider($configPath);
+        $provider->getConfig();
     }
 
     public function testCachesConfigOnSubsequentCalls(): void
@@ -98,14 +95,19 @@ YAML);
         file_put_contents($configPath, <<<YAML
 source: plainJson
 destination: youTrack
-sources: []
-destinations: []
+sources:
+  plainJson:
+    filePath: /path/to/time-entries.json
+destinations:
+  youTrack:
+    url: https://youtrack.example.com
+    token: your-api-token
 YAML);
 
         $provider = new YamlConfigProvider($configPath);
-        $first = $provider->get();
+        $first = $provider->getConfig();
         file_put_contents($configPath, 'corrupted');
-        $second = $provider->get();
+        $second = $provider->getConfig();
 
         $this->assertSame($first, $second);
     }
@@ -120,7 +122,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Invalid YAML syntax in config file');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionOnEmptyConfigFile(): void
@@ -133,7 +135,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Configuration file is empty or has invalid structure');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenSourceKeyMissing(): void
@@ -150,7 +152,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Missing required config key: "source"');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenSourceKeyIsNotString(): void
@@ -170,7 +172,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Config key "source" must be a string, got array');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenSourcesKeyIsNotMapping(): void
@@ -188,7 +190,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Config key "sources" must be a mapping, got string');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenDestinationsKeyIsNotMapping(): void
@@ -206,7 +208,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Config key "destinations" must be a mapping, got string');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenYouTrackConfigIsNotMapping(): void
@@ -225,7 +227,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Invalid youTrack destination config: expected a mapping.');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenDestinationKeyIsNotString(): void
@@ -245,7 +247,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Config key "destination" must be a string, got array');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenDestinationKeyMissing(): void
@@ -262,7 +264,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Missing required config key: "destination"');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionOnInvalidSourceType(): void
@@ -280,7 +282,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Invalid source type: "unknown"');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionOnInvalidDestinationType(): void
@@ -298,7 +300,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Invalid destination type: "jira"');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenYouTrackMissingUrl(): void
@@ -318,7 +320,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Missing required key "url" in destinations.youTrack config');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenYouTrackMissingToken(): void
@@ -338,7 +340,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Missing required key "token" in destinations.youTrack config');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenPlainJsonMissingFilePath(): void
@@ -358,7 +360,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Missing required key "filePath" in sources.plainJson config');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testThrowsExceptionWhenSuperProductivityMissingSyncFilePath(): void
@@ -378,7 +380,7 @@ YAML);
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Missing required key "syncFilePath" in sources.superProductivity config');
 
-        $provider->get();
+        $provider->getConfig();
     }
 
     public function testParsesConfigWithOnlySuperProductivitySource(): void
@@ -397,7 +399,7 @@ destinations:
 YAML);
 
         $provider = new YamlConfigProvider($configPath);
-        $config = $provider->get();
+        $config = $provider->getConfig();
 
         $this->assertNotNull($config->sources->superProductivity);
         $this->assertNull($config->sources->plainJson);
@@ -420,7 +422,7 @@ destinations:
 YAML);
 
         $provider = new YamlConfigProvider($configPath);
-        $config = $provider->get();
+        $config = $provider->getConfig();
 
         $this->assertNull($config->sources->superProductivity);
         $this->assertNotNull($config->sources->plainJson);

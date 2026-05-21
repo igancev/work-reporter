@@ -10,7 +10,6 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Socket\DnsSocketConnector;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Destination\YouTrack\YouTrackDestination;
-use RuntimeException;
 
 final readonly class ConcreteDestinationFactory implements DestinationFactory
 {
@@ -26,11 +25,14 @@ final readonly class ConcreteDestinationFactory implements DestinationFactory
         };
     }
 
+    /**
+     * @throws DestinationException
+     */
     private function buildYouTrackDestination(): YouTrackDestination
     {
-        $config = $this->configProvider->get()->destinations->youTrack;
-        if ($config === null) {
-            throw new RuntimeException("YouTrack destination configuration is missing");
+        $youtrackConfigDestinations = $this->configProvider->getConfig()->destinations->youTrack;
+        if ($youtrackConfigDestinations === null) {
+            throw new DestinationException("Definition of YouTrack destination missing in configuration");
         }
 
         return new YouTrackDestination(
@@ -39,8 +41,8 @@ final readonly class ConcreteDestinationFactory implements DestinationFactory
                     new UnlimitedConnectionPool(new DefaultConnectionFactory(new DnsSocketConnector()))
                 )
                 ->build(),
-            $config->url,
-            $config->token,
+            $youtrackConfigDestinations->url,
+            $youtrackConfigDestinations->token,
         );
     }
 }

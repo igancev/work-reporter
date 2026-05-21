@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Source\SuperProductivity;
 
+use Igancev\WorkReporter\Source\SourceException;
 use Igancev\WorkReporter\Source\SuperProductivity\Storage;
 use Igancev\WorkReporter\Source\SuperProductivity\Tag;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 #[CoversClass(Storage::class)]
 final class StorageTest extends TestCase
@@ -109,7 +109,7 @@ final class StorageTest extends TestCase
         $storage = new Storage($this->tempFile);
 
         // Assert
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SourceException::class);
         $this->expectExceptionMessage('SuperProductivitySyncDataSource: Unable to find task with id non-existent');
 
         // Act
@@ -158,7 +158,7 @@ final class StorageTest extends TestCase
         $storage = new Storage($this->tempFile);
 
         // Assert
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SourceException::class);
         $this->expectExceptionMessage('SuperProductivitySyncDataSource: Unable to find tag with id non-existent');
 
         // Act
@@ -173,9 +173,9 @@ final class StorageTest extends TestCase
         chmod($unreadableFile, 0000);
 
         // Assert
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SourceException::class);
         $this->expectExceptionMessage(
-            'SuperProductivitySyncDataSource: Unable to read sync data file ' . $unreadableFile,
+            'SuperProductivitySyncDataSource: Unable to read sync data file: ' . $unreadableFile,
         );
 
         try {
@@ -192,7 +192,7 @@ final class StorageTest extends TestCase
         file_put_contents($this->tempFile, 'no-curly-braces-here');
 
         // Assert
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SourceException::class);
         $this->expectExceptionMessage(
             'SuperProductivitySyncDataSource: Unable to parse start position "{" ' . $this->tempFile,
         );
@@ -207,7 +207,7 @@ final class StorageTest extends TestCase
         file_put_contents($this->tempFile, 'pf_4.4__{invalid-json}');
 
         // Assert
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SourceException::class);
         $this->expectExceptionMessage('SuperProductivitySyncDataSource: Unable to parse JSON:');
 
         // Act

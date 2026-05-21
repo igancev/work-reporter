@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Igancev\WorkReporter\Source\SuperProductivity;
 
+use Igancev\WorkReporter\Source\SourceException;
 use JsonException;
-use RuntimeException;
 
 /**
  * @internal
@@ -16,6 +16,9 @@ readonly class Storage
     /** @var array<mixed> */
     private array $jsonData;
 
+    /**
+     * @throws SourceException
+     */
     public function __construct(string $syncMetaPath)
     {
         $this->syncMetaPath = $syncMetaPath;
@@ -48,6 +51,7 @@ readonly class Storage
      *     subTaskIds: string[],
      *     tagIds: string[],
      * }
+     * @throws SourceException
      */
     public function getTaskById(string $taskId): array
     {
@@ -61,16 +65,19 @@ readonly class Storage
             return $this->jsonData['mainModelData']['archiveOld']['task']['entities'][$taskId];
         }
 
-        throw new RuntimeException('SuperProductivitySyncDataSource: Unable to find task with id ' . $taskId);
+        throw new SourceException('SuperProductivitySyncDataSource: Unable to find task with id ' . $taskId);
     }
 
-    /** @return array<mixed> */
+    /**
+     * @return array<mixed>
+     * @throws SourceException
+     */
     private function parseJson(): array
     {
         $content = @file_get_contents($this->syncMetaPath);
         if ($content === false) {
-            throw new RuntimeException(
-                'SuperProductivitySyncDataSource: Unable to read sync data file ' . $this->syncMetaPath,
+            throw new SourceException(
+                'SuperProductivitySyncDataSource: Unable to read sync data file: ' . $this->syncMetaPath,
             );
         }
 
@@ -78,7 +85,7 @@ readonly class Storage
         // json file starts with prefix like `pf_4.4__`, example: pf_4.4__{"revMap":{"menuTree":"1770462116462", ...
         $startPos = strpos($content, '{');
         if ($startPos === false) {
-            throw new RuntimeException(
+            throw new SourceException(
                 'SuperProductivitySyncDataSource: Unable to parse start position "{" ' . $this->syncMetaPath,
             );
         }
@@ -88,16 +95,19 @@ readonly class Storage
         try {
             $jsonData = json_decode($jsonString, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
-            throw new RuntimeException('SuperProductivitySyncDataSource: Unable to parse JSON: ' . $e->getMessage());
+            throw new SourceException('SuperProductivitySyncDataSource: Unable to parse JSON: ' . $e->getMessage());
         }
 
         return $jsonData;
     }
 
+    /**
+     * @throws SourceException
+     */
     public function getTagById(string $tagId): Tag
     {
         if (!array_key_exists($tagId, $this->jsonData['mainModelData']['tag']['entities'])) {
-            throw new RuntimeException('SuperProductivitySyncDataSource: Unable to find tag with id ' . $tagId);
+            throw new SourceException('SuperProductivitySyncDataSource: Unable to find tag with id ' . $tagId);
         }
 
         $tagName = $this->jsonData['mainModelData']['tag']['entities'][$tagId]['title'];

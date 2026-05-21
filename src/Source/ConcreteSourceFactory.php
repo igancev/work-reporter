@@ -7,7 +7,6 @@ namespace Igancev\WorkReporter\Source;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Source\PlainJson\PlainJsonTimeEntriesSource;
 use Igancev\WorkReporter\Source\SuperProductivity\SuperProductivitySyncSource;
-use RuntimeException;
 
 final readonly class ConcreteSourceFactory implements TimeEntriesSourceFactory
 {
@@ -24,21 +23,27 @@ final readonly class ConcreteSourceFactory implements TimeEntriesSourceFactory
         };
     }
 
+    /**
+     * @throws SourceException
+     */
     private function buildPlainJsonSource(): PlainJsonTimeEntriesSource
     {
-        $config = $this->configProvider->get()->sources->plainJson;
+        $config = $this->configProvider->getConfig()->sources->plainJson;
         if ($config === null) {
-            throw new RuntimeException("PlainJson source configuration is missing");
+            throw new SourceException("PlainJson source configuration is missing");
         }
 
         return new PlainJsonTimeEntriesSource($config->filePath);
     }
 
+    /**
+     * @throws SourceException
+     */
     private function buildFromSuperProductivitySource(): SuperProductivitySyncSource
     {
-        $config = $this->configProvider->get()->sources->superProductivity;
+        $config = $this->configProvider->getConfig()->sources->superProductivity;
         if ($config === null) {
-            throw new RuntimeException("SuperProductivity source configuration is missing");
+            throw new SourceException("SuperProductivity source configuration is missing");
         }
 
         return new SuperProductivitySyncSource($config->syncFilePath);

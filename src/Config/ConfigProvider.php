@@ -4,5 +4,8 @@ namespace Igancev\WorkReporter\Config;
 
 interface ConfigProvider
 {
-    public function get(): Config;
+    /**
+     * @throws ConfigException
+     */
+    public function getConfig(): Config;
 }

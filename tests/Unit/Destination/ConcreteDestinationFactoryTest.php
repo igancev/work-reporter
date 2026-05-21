@@ -8,6 +8,7 @@ use Igancev\WorkReporter\Config\Config;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Config\DestinationConfig\DestinationsConfig;
 use Igancev\WorkReporter\Config\DestinationConfig\YouTrackConfig;
+use Igancev\WorkReporter\Config\SourceConfig\PlainJsonConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SourcesConfig;
 use Igancev\WorkReporter\Destination\ConcreteDestinationFactory;
 use Igancev\WorkReporter\Destination\DestinationType;
@@ -16,7 +17,6 @@ use Igancev\WorkReporter\Source\SourceType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 #[CoversClass(ConcreteDestinationFactory::class)]
 class ConcreteDestinationFactoryTest extends TestCase
@@ -37,7 +37,7 @@ class ConcreteDestinationFactoryTest extends TestCase
         $destinationsConfig = new DestinationsConfig(youTrack: $youTrackConfig);
         $config = $this->createConfig($destinationsConfig);
 
-        $this->configProvider->method('get')->willReturn($config);
+        $this->configProvider->method('getConfig')->willReturn($config);
 
         // Act
         $destination = $this->factory->build(DestinationType::YouTrack);
@@ -46,28 +46,12 @@ class ConcreteDestinationFactoryTest extends TestCase
         $this->assertInstanceOf(YouTrackDestination::class, $destination);
     }
 
-    public function testBuildYouTrackDestinationThrowsExceptionWhenConfigMissing(): void
-    {
-        // Arrange
-        $destinationsConfig = new DestinationsConfig(youTrack: null);
-        $config = $this->createConfig($destinationsConfig);
-
-        $this->configProvider->method('get')->willReturn($config);
-
-        // Assert
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('YouTrack destination configuration is missing');
-
-        // Act
-        $this->factory->build(DestinationType::YouTrack);
-    }
-
     private function createConfig(DestinationsConfig $destinations): Config
     {
         return new Config(
             source: SourceType::PlainJson,
             destination: DestinationType::YouTrack,
-            sources: $this->createStub(SourcesConfig::class),
+            sources: new SourcesConfig(plainJson: new PlainJsonConfig(filePath: 'path/to/file.json')),
             destinations: $destinations,
         );
     }

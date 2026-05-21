@@ -12,6 +12,8 @@ use Igancev\WorkReporter\Config\Config;
 use Igancev\WorkReporter\Config\ConfigException;
 use Igancev\WorkReporter\Config\ConfigProvider;
 use Igancev\WorkReporter\Config\DestinationConfig\DestinationsConfig;
+use Igancev\WorkReporter\Config\DestinationConfig\YouTrackConfig;
+use Igancev\WorkReporter\Config\SourceConfig\PlainJsonConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SourcesConfig;
 use Igancev\WorkReporter\Destination\DeliveryEvent;
 use Igancev\WorkReporter\Destination\DeliveryStream;
@@ -60,11 +62,13 @@ final class WorkReportCommandTest extends TestCase
         $config = new Config(
             SourceType::PlainJson,
             DestinationType::YouTrack,
-            new SourcesConfig(),
-            new DestinationsConfig(),
+            new SourcesConfig(plainJson: new PlainJsonConfig(filePath: 'path/to/time-entries.json')),
+            new DestinationsConfig(
+                youTrack: new YouTrackConfig(url: 'https://example.com', token: 'token'),
+            ),
         );
         $configProvider = $this->createStub(ConfigProvider::class);
-        $configProvider->method('get')->willReturn($config);
+        $configProvider->method('getConfig')->willReturn($config);
 
         $command = new WorkReportCommand($sourceFactory, $destinationFactory, $configProvider);
         $this->tester = new CommandTester($command);
@@ -452,7 +456,7 @@ final class WorkReportCommandTest extends TestCase
     {
         // Arrange
         $configProvider = $this->createMock(ConfigProvider::class);
-        $configProvider->method('get')->willThrowException(new ConfigException('Config error'));
+        $configProvider->method('getConfig')->willThrowException(new ConfigException('Config error'));
 
         $command = new WorkReportCommand(
             $this->createStub(TimeEntriesSourceFactory::class),

@@ -22,7 +22,7 @@ class YamlConfigProvider implements ConfigProvider
     ) {
     }
 
-    public function get(): Config
+    public function getConfig(): Config
     {
         if ($this->config !== null) {
             return $this->config;
