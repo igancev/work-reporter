@@ -75,25 +75,26 @@ This creates a config file at `~/.config/work-reporter/config.yaml` with a templ
 Create a config file at `~/.config/work-reporter/config.yaml`:
 
 ```yaml
-# Active source and destination (choose one of each)
+# Active Source type: superProductivity | plainJson
 source: superProductivity
+
+# Active Destination type: youTrack | somethingElse
 destination: youTrack
 
+# Configuration for each source type
 sources:
-  # SuperProductivity sync file path
-  superProductivity:
-    syncFilePath: ~/.config/superproductivity/__meta_
+    superProductivity:
+        syncFilePath: ~/.config/superproductivity/__meta_
+    plainJson:
+        filePath: /path/to/time-entries.json
 
-  # Or use a plain JSON file as a source
-  plainJson:
-    filePath: ~/worklogs.json
-
+# Configuration for each destination type
 destinations:
-  youTrack:
-    # Your YouTrack instance URL
-    url: https://youtrack.example.com
-    # Permanent token for authentication (see below)
-    token: perm-your-permanent-token
+    youTrack:
+        # Your YouTrack instance URL
+        url: https://youtrack.example.com
+        # Permanent token for authentication
+        token: your-api-token
 ```
 
 #### 🔑 Getting a YouTrack Token
@@ -108,7 +109,7 @@ destinations:
 1. Open SuperProductivity → **Settings** → **Sync & Export** → **Sync**
 2. Enable **Enable Syncing**
 3. Choose **Sync folder path**
-4. Paste the same path into `syncFilePath` in your config file
+4. Paste the same path into `sources.superProductivity.syncFilePath` in your config file
 
 ---
 
