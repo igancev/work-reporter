@@ -21,7 +21,7 @@ readonly class Storage
      */
     public function __construct(string $syncMetaPath)
     {
-        $this->syncMetaPath = $syncMetaPath;
+        $this->syncMetaPath = str_replace("~", (string)getenv("HOME"), $syncMetaPath);
         $this->jsonData = $this->parseJson();
     }
 
