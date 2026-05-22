@@ -19,6 +19,8 @@ At work, you need to log time spent on tasks. Throughout the day you switch betw
 
 ### ✨ Features & Supported Integrations
 
+![](./docs/resources/wr-processed.jpg)
+
 - 📥 **Supported sources:**
   - [SuperProductivity](https://super-productivity.com/) (sync file)
   - Plain JSON file
