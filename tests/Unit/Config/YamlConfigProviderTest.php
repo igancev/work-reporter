@@ -63,16 +63,13 @@ YAML);
 
         $this->assertSame(SourceType::SuperProductivity, $config->source);
         $this->assertSame(DestinationType::YouTrack, $config->destination);
-        $this->assertNotNull($config->sources->superProductivity);
-        $this->assertSame('/tmp/sp_sync', $config->sources->superProductivity->syncFilePath);
-        $this->assertNotNull($config->sources->plainJson);
-        $this->assertSame('/tmp/plain.json', $config->sources->plainJson->filePath);
-        $this->assertNotNull($config->destinations->youTrack);
-        $this->assertSame('http://localhost:8080', $config->destinations->youTrack->url);
-        $this->assertSame('test-token-123', $config->destinations->youTrack->token);
+        $this->assertSame('/tmp/sp_sync', $config->sources->getSuperProductivity()->syncFilePath);
+        $this->assertSame('/tmp/plain.json', $config->sources->getPlainJson()->filePath);
+        $this->assertSame('http://localhost:8080', $config->destinations->getYouTrack()->url);
+        $this->assertSame('test-token-123', $config->destinations->getYouTrack()->token);
     }
 
-    public function testThrowsExceptionWhenDestinationNotConfigured(): void
+    public function testCreatesConfigWithNullDestinationWhenNotConfigured(): void
     {
         $configPath = $this->tempDir . '/config.yaml';
         file_put_contents($configPath, <<<YAML
@@ -82,11 +79,10 @@ sources: []
 destinations: []
 YAML);
 
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Destination youTrack is not configured');
-
         $provider = new YamlConfigProvider($configPath);
-        $provider->getConfig();
+        $config = $provider->getConfig();
+
+        $this->assertSame(DestinationType::YouTrack, $config->destination);
     }
 
     public function testCachesConfigOnSubsequentCalls(): void
@@ -401,9 +397,9 @@ YAML);
         $provider = new YamlConfigProvider($configPath);
         $config = $provider->getConfig();
 
-        $this->assertNotNull($config->sources->superProductivity);
-        $this->assertNull($config->sources->plainJson);
-        $this->assertSame('/tmp/sync', $config->sources->superProductivity->syncFilePath);
+        $this->assertSame('/tmp/sync', $config->sources->getSuperProductivity()->syncFilePath);
+        $this->expectException(ConfigException::class);
+        $config->sources->getPlainJson();
     }
 
     public function testParsesConfigWithOnlyPlainJsonSource(): void
@@ -424,8 +420,8 @@ YAML);
         $provider = new YamlConfigProvider($configPath);
         $config = $provider->getConfig();
 
-        $this->assertNull($config->sources->superProductivity);
-        $this->assertNotNull($config->sources->plainJson);
-        $this->assertSame('/tmp/data.json', $config->sources->plainJson->filePath);
+        $this->assertSame('/tmp/data.json', $config->sources->getPlainJson()->filePath);
+        $this->expectException(ConfigException::class);
+        $config->sources->getSuperProductivity();
     }
 }

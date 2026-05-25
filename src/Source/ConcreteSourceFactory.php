@@ -28,10 +28,7 @@ final readonly class ConcreteSourceFactory implements TimeEntriesSourceFactory
      */
     private function buildPlainJsonSource(): PlainJsonTimeEntriesSource
     {
-        $config = $this->configProvider->getConfig()->sources->plainJson;
-        if ($config === null) {
-            throw new SourceException("PlainJson source configuration is missing");
-        }
+        $config = $this->configProvider->getConfig()->sources->getPlainJson();
 
         return new PlainJsonTimeEntriesSource($config->filePath);
     }
@@ -41,10 +38,7 @@ final readonly class ConcreteSourceFactory implements TimeEntriesSourceFactory
      */
     private function buildFromSuperProductivitySource(): SuperProductivitySyncSource
     {
-        $config = $this->configProvider->getConfig()->sources->superProductivity;
-        if ($config === null) {
-            throw new SourceException("SuperProductivity source configuration is missing");
-        }
+        $config = $this->configProvider->getConfig()->sources->getSuperProductivity();
 
         return new SuperProductivitySyncSource($config->syncFilePath);
     }
