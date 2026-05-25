@@ -24,13 +24,5 @@ readonly class Config
         if (!property_exists($this->sources, $this->source->value)) {
             throw new LogicException("Source {$this->source->value} is not supported");
         }
-
-        if ($this->destinations->{$this->destination->value} === null) {
-            throw new ConfigException("Destination {$this->destination->value} is not configured");
-        }
-
-        if ($this->sources->{$this->source->value} === null) {
-            throw new ConfigException("Source {$this->source->value} is not configured");
-        }
     }
 }

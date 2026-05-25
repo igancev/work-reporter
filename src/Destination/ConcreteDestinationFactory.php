@@ -30,10 +30,7 @@ final readonly class ConcreteDestinationFactory implements DestinationFactory
      */
     private function buildYouTrackDestination(): YouTrackDestination
     {
-        $youtrackConfigDestinations = $this->configProvider->getConfig()->destinations->youTrack;
-        if ($youtrackConfigDestinations === null) {
-            throw new DestinationException("Definition of YouTrack destination missing in configuration");
-        }
+        $youtrackConfig = $this->configProvider->getConfig()->destinations->getYouTrack();
 
         return new YouTrackDestination(
             new HttpClientBuilder()
@@ -41,8 +38,8 @@ final readonly class ConcreteDestinationFactory implements DestinationFactory
                     new UnlimitedConnectionPool(new DefaultConnectionFactory(new DnsSocketConnector()))
                 )
                 ->build(),
-            $youtrackConfigDestinations->url,
-            $youtrackConfigDestinations->token,
+            $youtrackConfig->url,
+            $youtrackConfig->token,
         );
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Config;
 
 use Igancev\WorkReporter\Config\Config;
+use Igancev\WorkReporter\Config\ConfigException;
 use Igancev\WorkReporter\Config\DestinationConfig\DestinationsConfig;
 use Igancev\WorkReporter\Config\DestinationConfig\YouTrackConfig;
 use Igancev\WorkReporter\Config\SourceConfig\PlainJsonConfig;
@@ -46,19 +47,52 @@ final class ConfigTest extends TestCase
         $this->assertSame($destinationsConfig, $config->destinations);
     }
 
-    public function testSourcesConfigDefaults(): void
+    public function testSourcesConfigGetPlainJsonThrowsWhenNull(): void
     {
         $config = new SourcesConfig();
 
-        $this->assertNull($config->superProductivity);
-        $this->assertNull($config->plainJson);
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Source plainJson is not configured');
+
+        $config->getPlainJson();
     }
 
-    public function testDestinationsConfigDefaults(): void
+    public function testSourcesConfigGetSuperProductivityThrowsWhenNull(): void
+    {
+        $config = new SourcesConfig();
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Source superProductivity is not configured');
+
+        $config->getSuperProductivity();
+    }
+
+    public function testDestinationsConfigGetYouTrackThrowsWhenNull(): void
     {
         $config = new DestinationsConfig();
 
-        $this->assertNull($config->youTrack);
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Destination youTrack is not configured');
+
+        $config->getYouTrack();
+    }
+
+    public function testSourcesConfigGettersReturnValues(): void
+    {
+        $plainJson = new PlainJsonConfig('/tmp/plain.json');
+        $superProductivity = new SuperProductivityConfig('/tmp/sync');
+        $config = new SourcesConfig($superProductivity, $plainJson);
+
+        $this->assertSame($plainJson, $config->getPlainJson());
+        $this->assertSame($superProductivity, $config->getSuperProductivity());
+    }
+
+    public function testDestinationsConfigGetterReturnsValue(): void
+    {
+        $youTrack = new YouTrackConfig('http://yt.local', 'token');
+        $config = new DestinationsConfig($youTrack);
+
+        $this->assertSame($youTrack, $config->getYouTrack());
     }
 
     public function testPlainJsonConfigStoresFilePath(): void
