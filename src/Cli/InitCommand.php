@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Igancev\WorkReporter\Cli;
 
+use Igancev\WorkReporter\Platform\HomeDirectory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -55,7 +56,7 @@ YAML;
     {
         $io = new SymfonyStyle($input, $output);
 
-        $home = (string) getenv('HOME');
+        $home = HomeDirectory::resolve();
         $configDir = str_replace('~', $home, self::DEFAULT_CONFIG_DIR);
         $configPath = str_replace('~', $home, self::DEFAULT_CONFIG_PATH);
 
