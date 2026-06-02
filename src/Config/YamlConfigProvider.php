@@ -8,6 +8,7 @@ use Igancev\WorkReporter\Config\SourceConfig\PlainJsonConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SourcesConfig;
 use Igancev\WorkReporter\Config\SourceConfig\SuperProductivityConfig;
 use Igancev\WorkReporter\Destination\DestinationType;
+use Igancev\WorkReporter\Platform\HomeDirectory;
 use Igancev\WorkReporter\Source\SourceType;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -28,7 +29,7 @@ class YamlConfigProvider implements ConfigProvider
             return $this->config;
         }
 
-        $path = str_replace("~", (string)getenv("HOME"), $this->configPath);
+        $path = str_replace("~", HomeDirectory::resolve(), $this->configPath);
 
         if (!file_exists($path)) {
             throw new ConfigException(sprintf(
