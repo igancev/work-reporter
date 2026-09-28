@@ -29,9 +29,8 @@ final readonly class TaskFactory
             $parentTaskTitle = $this->storage->getTaskById($parentTaskId)['title'];
         }
 
-        $parentId = $rawTask['parentId'] ?? null;
         $subtasks = [];
-        if (!$parentId) {
+        if (!$parentTaskId) {
             $subtaskIds = $rawTask['subTaskIds'];
             foreach ($subtaskIds as $subId) {
                 $subtasks[] = $this->fromTaskId($subId);

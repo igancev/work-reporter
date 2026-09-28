@@ -18,9 +18,9 @@ final readonly class SuperProductivitySyncSource implements TimeEntriesSource
      * @throws SourceException
      */
     public function __construct(
-        string $syncMetaPath,
+        string $syncFilePath,
     ) {
-        $this->storage = new Storage($syncMetaPath);
+        $this->storage = new Storage($syncFilePath);
         $this->taskFactory = new TaskFactory($this->storage);
     }
 

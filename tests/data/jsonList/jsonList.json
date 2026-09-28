@@ -3,35 +3,35 @@
         {
             "date": "2026-02-04",
             "duration": "2h15m",
-            "taskId": "DLS-111",
+            "taskId": "PROJ-111",
             "workType": "Development",
             "comment": "Create new component"
         },
         {
             "date": "2026-02-04",
             "duration": "2h30m",
-            "taskId": "DLS-111",
+            "taskId": "PROJ-111",
             "workType": "Development",
             "comment": "Refactoring"
         },
         {
             "date": "2026-02-04",
             "duration": "1h15m",
-            "taskId": "DLS-111",
+            "taskId": "PROJ-111",
             "workType": "Review",
             "comment": "Comments"
         },
         {
             "date": "2026-02-05",
             "duration": "3h",
-            "taskId": "DLS-333",
+            "taskId": "PROJ-333",
             "workType": "Meeting",
             "comment": "Retrospective"
         },
         {
             "date": "2026-02-05",
             "duration": "5h",
-            "taskId": "DLS-333",
+            "taskId": "PROJ-333",
             "workType": "Meeting",
             "comment": "Daily"
         }
