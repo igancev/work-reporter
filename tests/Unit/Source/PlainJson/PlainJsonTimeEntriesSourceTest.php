@@ -38,7 +38,7 @@ class PlainJsonTimeEntriesSourceTest extends TestCase
 
         $this->assertEquals(
             new TimeEntry(
-                taskId: 'DLS-111',
+                taskId: 'PROJ-111',
                 duration: Duration::fromString('2h15m'),
                 workType: 'Development',
                 date: new DateTimeImmutable('2026-02-04'),
@@ -49,7 +49,7 @@ class PlainJsonTimeEntriesSourceTest extends TestCase
 
         $this->assertEquals(
             new TimeEntry(
-                taskId: 'DLS-333',
+                taskId: 'PROJ-333',
                 duration: Duration::fromString('5h'),
                 workType: 'Meeting',
                 date: new DateTimeImmutable('2026-02-05'),
@@ -72,7 +72,7 @@ class PlainJsonTimeEntriesSourceTest extends TestCase
 
         // Assert
         $this->assertCount(2, $timeEntries);
-        $this->assertEquals('DLS-333', $timeEntries[0]->taskId);
+        $this->assertEquals('PROJ-333', $timeEntries[0]->taskId);
         $this->assertEquals('2026-02-05', $timeEntries[0]->date->format('Y-m-d'));
     }
 
@@ -166,7 +166,7 @@ class PlainJsonTimeEntriesSourceTest extends TestCase
             'timeEntries' => [
                 [
                     'date' => 'invalid-date',
-                    'taskId' => 'DLS-111',
+                    'taskId' => 'PROJ-111',
                     'duration' => '1h',
                     'workType' => 'Development'
                 ]

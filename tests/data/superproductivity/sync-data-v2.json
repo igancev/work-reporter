@@ -1,0 +1,629 @@
+pf_2__{
+    "version": 2,
+    "syncVersion": 1,
+    "schemaVersion": 1,
+    "vectorClock": {
+        "BCLmldxz4h62_8": 120
+    },
+    "lastModified": 1770583761269,
+    "clientId": "BCLmldxz4h62_8",
+    "state": {
+        "task": {
+            "ids": [
+                "xeKU7IH1Qib5MKx3DPHI1",
+                "ddVoIXZlPeV8rTquVM6wq",
+                "FcWrFcGDeaZTusYKjKmrt",
+                "jBQP2ixnvVYUBanHHo98S",
+                "7zpQjv6rNj5OdnJ1su-4m",
+                "wFT8B9XxwrdBk-sYoqx4n",
+                "Tsq81c7XKEZv0WpGVNuK8",
+                "NP3npKogHOlZzLaGB0cld",
+                "Chq4w02oZvK-iuXzR60rQ",
+                "DlhHVMnCfuksv-dNs0igQ",
+                "CSIhGVNXJhpRzkr6kpk6m",
+                "swWxbVEvg74pEG85_F4uH",
+                "s0lEgQFTCpT4he68C_4DG",
+                "ACTIVE_SUB_OF_ARCHIVED_1"
+            ],
+            "entities": {
+                "xeKU7IH1Qib5MKx3DPHI1": {
+                    "id": "xeKU7IH1Qib5MKx3DPHI1",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 3600000
+                    },
+                    "timeSpent": 3600000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "PROJ-111 Задача без подзадач",
+                    "tagIds": [
+                        "noeVVIDTkc1K1NkZ1nih1"
+                    ],
+                    "created": 1770567692721,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "dueDay": "2026-02-08",
+                    "modified": 1770580941475
+                },
+                "ddVoIXZlPeV8rTquVM6wq": {
+                    "id": "ddVoIXZlPeV8rTquVM6wq",
+                    "subTaskIds": [
+                        "NP3npKogHOlZzLaGB0cld",
+                        "Chq4w02oZvK-iuXzR60rQ",
+                        "DlhHVMnCfuksv-dNs0igQ",
+                        "CSIhGVNXJhpRzkr6kpk6m"
+                    ],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 7200000
+                    },
+                    "timeSpent": 7200000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "PROJ-222 Задача с подзадачами",
+                    "tagIds": [],
+                    "created": 1770567728834,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "dueDay": "2026-02-08",
+                    "modified": 1770567898047
+                },
+                "FcWrFcGDeaZTusYKjKmrt": {
+                    "id": "FcWrFcGDeaZTusYKjKmrt",
+                    "subTaskIds": [
+                        "jBQP2ixnvVYUBanHHo98S",
+                        "7zpQjv6rNj5OdnJ1su-4m",
+                        "wFT8B9XxwrdBk-sYoqx4n",
+                        "Tsq81c7XKEZv0WpGVNuK8",
+                        "swWxbVEvg74pEG85_F4uH",
+                        "s0lEgQFTCpT4he68C_4DG"
+                    ],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 14400000
+                    },
+                    "timeSpent": 14400000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "PROJ-333 Задача с подзадачами еще одна",
+                    "tagIds": [
+                        "SL10hXB0ntJJE3HpKovLj"
+                    ],
+                    "created": 1770567823184,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "dueDay": "2026-02-08",
+                    "modified": 1770567932879
+                },
+                "jBQP2ixnvVYUBanHHo98S": {
+                    "id": "jBQP2ixnvVYUBanHHo98S",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 3600000
+                    },
+                    "timeSpent": 3600000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 1 час",
+                    "tagIds": [
+                        "3tEZ_9fR6rIxgE2XNZ7Gn"
+                    ],
+                    "created": 1770567940980,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "FcWrFcGDeaZTusYKjKmrt",
+                    "modified": 1770568040588
+                },
+                "7zpQjv6rNj5OdnJ1su-4m": {
+                    "id": "7zpQjv6rNj5OdnJ1su-4m",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 7200000
+                    },
+                    "timeSpent": 7200000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 2 часа",
+                    "tagIds": [],
+                    "created": 1770567962105,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "FcWrFcGDeaZTusYKjKmrt",
+                    "modified": 1770580969742
+                },
+                "wFT8B9XxwrdBk-sYoqx4n": {
+                    "id": "wFT8B9XxwrdBk-sYoqx4n",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 1800000
+                    },
+                    "timeSpent": 1800000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 30 минут",
+                    "tagIds": [
+                        "xQICYlQWnz45HkcwTOgAi"
+                    ],
+                    "created": 1770568014537,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "FcWrFcGDeaZTusYKjKmrt",
+                    "modified": 1770579328433
+                },
+                "Tsq81c7XKEZv0WpGVNuK8": {
+                    "id": "Tsq81c7XKEZv0WpGVNuK8",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 900000
+                    },
+                    "timeSpent": 900000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 15 минут",
+                    "tagIds": [
+                        "noeVVIDTkc1K1NkZ1nih1"
+                    ],
+                    "created": 1770568027330,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "FcWrFcGDeaZTusYKjKmrt",
+                    "modified": 1770579332047
+                },
+                "NP3npKogHOlZzLaGB0cld": {
+                    "id": "NP3npKogHOlZzLaGB0cld",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 600000
+                    },
+                    "timeSpent": 600000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 10 минут",
+                    "tagIds": [
+                        "xQICYlQWnz45HkcwTOgAi"
+                    ],
+                    "created": 1770568106127,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "ddVoIXZlPeV8rTquVM6wq",
+                    "modified": 1770568412696
+                },
+                "Chq4w02oZvK-iuXzR60rQ": {
+                    "id": "Chq4w02oZvK-iuXzR60rQ",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 1200000
+                    },
+                    "timeSpent": 1200000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 20 минут",
+                    "tagIds": [
+                        "3tEZ_9fR6rIxgE2XNZ7Gn"
+                    ],
+                    "created": 1770568142077,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "ddVoIXZlPeV8rTquVM6wq",
+                    "modified": 1770568417464
+                },
+                "DlhHVMnCfuksv-dNs0igQ": {
+                    "id": "DlhHVMnCfuksv-dNs0igQ",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 1800000
+                    },
+                    "timeSpent": 1800000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 30 минут",
+                    "tagIds": [
+                        "SL10hXB0ntJJE3HpKovLj"
+                    ],
+                    "created": 1770568154982,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "ddVoIXZlPeV8rTquVM6wq",
+                    "modified": 1770568423478
+                },
+                "CSIhGVNXJhpRzkr6kpk6m": {
+                    "id": "CSIhGVNXJhpRzkr6kpk6m",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 3600000
+                    },
+                    "timeSpent": 3600000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача 1 час",
+                    "tagIds": [
+                        "noeVVIDTkc1K1NkZ1nih1"
+                    ],
+                    "created": 1770568217187,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "ddVoIXZlPeV8rTquVM6wq",
+                    "modified": 1770568429216
+                },
+                "swWxbVEvg74pEG85_F4uH": {
+                    "id": "swWxbVEvg74pEG85_F4uH",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-08": 900000
+                    },
+                    "timeSpent": 900000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Вторая подзадача на 15 минут",
+                    "tagIds": [
+                        "noeVVIDTkc1K1NkZ1nih1"
+                    ],
+                    "created": 1770583593110,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "FcWrFcGDeaZTusYKjKmrt",
+                    "modified": 1770583695086
+                },
+                "s0lEgQFTCpT4he68C_4DG": {
+                    "id": "s0lEgQFTCpT4he68C_4DG",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {},
+                    "timeSpent": 0,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Подзадача без отмеченного времени",
+                    "tagIds": [
+                        "xQICYlQWnz45HkcwTOgAi"
+                    ],
+                    "created": 1770583705042,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "FcWrFcGDeaZTusYKjKmrt",
+                    "modified": 1770583761265
+                },
+                "ACTIVE_SUB_OF_ARCHIVED_1": {
+                    "id": "ACTIVE_SUB_OF_ARCHIVED_1",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-05": 600000
+                    },
+                    "timeSpent": 600000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Активная подзадача архивного родителя",
+                    "tagIds": [
+                        "xQICYlQWnz45HkcwTOgAi"
+                    ],
+                    "created": 1770583705042,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "ARCHIVE_OLD_TASK_1",
+                    "modified": 1770583761265
+                }
+            },
+            "currentTaskId": null,
+            "selectedTaskId": null,
+            "isDataLoaded": true
+        },
+        "timeTracking": {
+            "tag": {},
+            "project": {}
+        },
+        "tag": {
+            "ids": [
+                "TODAY",
+                "xQICYlQWnz45HkcwTOgAi",
+                "3tEZ_9fR6rIxgE2XNZ7Gn",
+                "SL10hXB0ntJJE3HpKovLj",
+                "noeVVIDTkc1K1NkZ1nih1"
+            ],
+            "entities": {
+                "TODAY": {
+                    "color": null,
+                    "created": 1770567165373,
+                    "advancedCfg": {
+                        "worklogExportSettings": {
+                            "cols": [
+                                "DATE",
+                                "START",
+                                "END",
+                                "TIME_CLOCK",
+                                "TITLES_INCLUDING_SUB"
+                            ],
+                            "roundWorkTimeTo": null,
+                            "roundStartTimeTo": null,
+                            "roundEndTimeTo": null,
+                            "separateTasksBy": " | ",
+                            "groupBy": "DATE"
+                        }
+                    },
+                    "theme": {
+                        "isAutoContrast": true,
+                        "isDisableBackgroundTint": true,
+                        "primary": "#6495ED",
+                        "huePrimary": "400",
+                        "accent": "#ff4081",
+                        "hueAccent": "500",
+                        "warn": "#e11826",
+                        "hueWarn": "500",
+                        "backgroundImageDark": "",
+                        "backgroundImageLight": null
+                    },
+                    "taskIds": [
+                        "xeKU7IH1Qib5MKx3DPHI1",
+                        "ddVoIXZlPeV8rTquVM6wq",
+                        "FcWrFcGDeaZTusYKjKmrt"
+                    ],
+                    "icon": "wb_sunny",
+                    "id": "TODAY",
+                    "title": "Today"
+                },
+                "xQICYlQWnz45HkcwTOgAi": {
+                    "color": "#a05db1",
+                    "created": 1770567211342,
+                    "advancedCfg": {
+                        "worklogExportSettings": {
+                            "cols": [
+                                "DATE",
+                                "START",
+                                "END",
+                                "TIME_CLOCK",
+                                "TITLES_INCLUDING_SUB"
+                            ],
+                            "roundWorkTimeTo": null,
+                            "roundStartTimeTo": null,
+                            "roundEndTimeTo": null,
+                            "separateTasksBy": " | ",
+                            "groupBy": "DATE"
+                        }
+                    },
+                    "theme": {
+                        "isAutoContrast": true,
+                        "isDisableBackgroundTint": false,
+                        "primary": "#a7b15d",
+                        "huePrimary": "500",
+                        "accent": "#ff4081",
+                        "hueAccent": "500",
+                        "warn": "#e11826",
+                        "hueWarn": "500",
+                        "backgroundImageDark": null,
+                        "backgroundImageLight": null
+                    },
+                    "taskIds": [
+                        "s0lEgQFTCpT4he68C_4DG",
+                        "NP3npKogHOlZzLaGB0cld",
+                        "wFT8B9XxwrdBk-sYoqx4n"
+                    ],
+                    "icon": null,
+                    "id": "xQICYlQWnz45HkcwTOgAi",
+                    "title": "Подготовка задач"
+                },
+                "3tEZ_9fR6rIxgE2XNZ7Gn": {
+                    "color": "#5d63b1",
+                    "created": 1770567301679,
+                    "advancedCfg": {
+                        "worklogExportSettings": {
+                            "cols": [
+                                "DATE",
+                                "START",
+                                "END",
+                                "TIME_CLOCK",
+                                "TITLES_INCLUDING_SUB"
+                            ],
+                            "roundWorkTimeTo": null,
+                            "roundStartTimeTo": null,
+                            "roundEndTimeTo": null,
+                            "separateTasksBy": " | ",
+                            "groupBy": "DATE"
+                        }
+                    },
+                    "theme": {
+                        "isAutoContrast": true,
+                        "isDisableBackgroundTint": false,
+                        "primary": "#635db1",
+                        "huePrimary": "500",
+                        "accent": "#ff4081",
+                        "hueAccent": "500",
+                        "warn": "#e11826",
+                        "hueWarn": "500",
+                        "backgroundImageDark": null,
+                        "backgroundImageLight": null
+                    },
+                    "taskIds": [
+                        "Chq4w02oZvK-iuXzR60rQ",
+                        "jBQP2ixnvVYUBanHHo98S"
+                    ],
+                    "icon": null,
+                    "id": "3tEZ_9fR6rIxgE2XNZ7Gn",
+                    "title": "Встречи"
+                },
+                "SL10hXB0ntJJE3HpKovLj": {
+                    "color": "#5db18a",
+                    "created": 1770567347849,
+                    "advancedCfg": {
+                        "worklogExportSettings": {
+                            "cols": [
+                                "DATE",
+                                "START",
+                                "END",
+                                "TIME_CLOCK",
+                                "TITLES_INCLUDING_SUB"
+                            ],
+                            "roundWorkTimeTo": null,
+                            "roundStartTimeTo": null,
+                            "roundEndTimeTo": null,
+                            "separateTasksBy": " | ",
+                            "groupBy": "DATE"
+                        }
+                    },
+                    "theme": {
+                        "isAutoContrast": true,
+                        "isDisableBackgroundTint": false,
+                        "primary": "#5db16b",
+                        "huePrimary": "500",
+                        "accent": "#ff4081",
+                        "hueAccent": "500",
+                        "warn": "#e11826",
+                        "hueWarn": "500",
+                        "backgroundImageDark": null,
+                        "backgroundImageLight": null
+                    },
+                    "taskIds": [
+                        "DlhHVMnCfuksv-dNs0igQ",
+                        "FcWrFcGDeaZTusYKjKmrt"
+                    ],
+                    "icon": null,
+                    "id": "SL10hXB0ntJJE3HpKovLj",
+                    "title": "Разработка"
+                },
+                "noeVVIDTkc1K1NkZ1nih1": {
+                    "color": "#cd184e",
+                    "created": 1770567653607,
+                    "advancedCfg": {
+                        "worklogExportSettings": {
+                            "cols": [
+                                "DATE",
+                                "START",
+                                "END",
+                                "TIME_CLOCK",
+                                "TITLES_INCLUDING_SUB"
+                            ],
+                            "roundWorkTimeTo": null,
+                            "roundStartTimeTo": null,
+                            "roundEndTimeTo": null,
+                            "separateTasksBy": " | ",
+                            "groupBy": "DATE"
+                        }
+                    },
+                    "theme": {
+                        "isAutoContrast": true,
+                        "isDisableBackgroundTint": false,
+                        "primary": "#cd5182",
+                        "huePrimary": "500",
+                        "accent": "#ff4081",
+                        "hueAccent": "500",
+                        "warn": "#e11826",
+                        "hueWarn": "500",
+                        "backgroundImageDark": null,
+                        "backgroundImageLight": null
+                    },
+                    "taskIds": [
+                        "swWxbVEvg74pEG85_F4uH",
+                        "xeKU7IH1Qib5MKx3DPHI1",
+                        "CSIhGVNXJhpRzkr6kpk6m",
+                        "Tsq81c7XKEZv0WpGVNuK8"
+                    ],
+                    "icon": null,
+                    "id": "noeVVIDTkc1K1NkZ1nih1",
+                    "title": "Ревью"
+                }
+            }
+        },
+        "archiveYoung": {
+            "task": {
+                "ids": [],
+                "entities": {}
+            },
+            "timeTracking": {
+                "tag": {},
+                "project": {}
+            },
+            "lastTimeTrackingFlush": 0
+        },
+        "archiveOld": {
+            "task": {
+                "ids": [],
+                "entities": {}
+            },
+            "timeTracking": {
+                "tag": {},
+                "project": {}
+            },
+            "lastTimeTrackingFlush": 0
+        }
+    },
+    "archiveYoung": {
+        "task": {
+            "ids": [
+                "ARCHIVE_YOUNG_PARENT_1",
+                "ARCHIVE_YOUNG_SUB_1"
+            ],
+            "entities": {
+                "ARCHIVE_YOUNG_PARENT_1": {
+                    "id": "ARCHIVE_YOUNG_PARENT_1",
+                    "subTaskIds": [
+                        "ARCHIVE_YOUNG_SUB_1"
+                    ],
+                    "timeSpentOnDay": {
+                        "2026-02-07": 3600000
+                    },
+                    "timeSpent": 3600000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "PROJ-444 Архивная задача",
+                    "tagIds": [],
+                    "created": 1770568000000,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "modified": 1770580000000
+                },
+                "ARCHIVE_YOUNG_SUB_1": {
+                    "id": "ARCHIVE_YOUNG_SUB_1",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-07": 1800000
+                    },
+                    "timeSpent": 1800000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "Архивная подзадача",
+                    "tagIds": [
+                        "3tEZ_9fR6rIxgE2XNZ7Gn"
+                    ],
+                    "created": 1770568000001,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "parentId": "ARCHIVE_YOUNG_PARENT_1",
+                    "modified": 1770580000001
+                }
+            }
+        },
+        "timeTracking": {
+            "tag": {},
+            "project": {}
+        },
+        "lastTimeTrackingFlush": 0
+    },
+    "archiveOld": {
+        "task": {
+            "ids": [
+                "ARCHIVE_OLD_TASK_1"
+            ],
+            "entities": {
+                "ARCHIVE_OLD_TASK_1": {
+                    "id": "ARCHIVE_OLD_TASK_1",
+                    "subTaskIds": [],
+                    "timeSpentOnDay": {
+                        "2026-02-06": 900000
+                    },
+                    "timeSpent": 900000,
+                    "timeEstimate": 0,
+                    "isDone": false,
+                    "title": "PROJ-555 Старая архивная задача",
+                    "tagIds": [
+                        "SL10hXB0ntJJE3HpKovLj"
+                    ],
+                    "created": 1770568000002,
+                    "attachments": [],
+                    "projectId": "INBOX_PROJECT",
+                    "modified": 1770580000002
+                }
+            }
+        },
+        "timeTracking": {
+            "tag": {},
+            "project": {}
+        },
+        "lastTimeTrackingFlush": 0
+    },
+    "recentOps": [],
+    "oldestOpSyncVersion": 0
+}

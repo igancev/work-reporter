@@ -64,6 +64,7 @@ class InitCommandTest extends TestCase
         $this->assertStringContainsString('source:', $content);
         $this->assertStringContainsString('destination:', $content);
         $this->assertStringContainsString('youTrack', $content);
+        $this->assertStringContainsString('sync-data.json', $content);
     }
 
     public function testCreatesDirectoryIfNotExists(): void

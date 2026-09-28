@@ -28,7 +28,7 @@ destination: youTrack
 # Configuration for each source type
 sources:
   superProductivity:
-    syncFilePath: ~/.config/superProductivity/__meta_
+    syncFilePath: ~/.config/superProductivity/sync-data.json
   plainJson:
     filePath: /path/to/time-entries.json
 
