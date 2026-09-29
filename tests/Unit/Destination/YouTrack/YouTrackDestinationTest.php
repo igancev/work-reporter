@@ -11,6 +11,7 @@ use Amp\Http\Client\DelegateHttpClient;
 use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
+use Amp\Http\Client\TimeoutException;
 use Amp\Http\InvalidHeaderException;
 use DateTimeImmutable;
 use Igancev\WorkReporter\Destination\DeliveryEvent;
@@ -24,6 +25,8 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+
+use function Amp\delay;
 
 #[CoversClass(YouTrackDestination::class)]
 #[CoversClass(WorkItem::class)]
@@ -378,6 +381,126 @@ final class YouTrackDestinationTest extends TestCase
 
         // Act
         $this->destination->logTimeEntries([$entry]);
+    }
+
+    /**
+     * @throws DestinationException
+     */
+    public function testLimitsConcurrentReports(): void
+    {
+        // Arrange
+        $entries = [];
+        for ($i = 1; $i <= 20; $i++) {
+            $entries[] = $this->createEntry('PROJ-' . $i, 'Development');
+        }
+
+        $activeReports = 0;
+        $maxActiveReports = 0;
+        $this->httpClient->expects($this->exactly(22))->method('request')->willReturnCallback(
+            function (Request $request) use (&$activeReports, &$maxActiveReports): Response {
+                if ($request->getMethod() === 'GET') {
+                    return $this->createMetadataResponse($request);
+                }
+
+                $activeReports++;
+                $maxActiveReports = max($maxActiveReports, $activeReports);
+                delay(0.01);
+                $activeReports--;
+
+                return $this->createResponse(200, []);
+            }
+        );
+
+        // Act
+        $events = iterator_to_array($this->destination->logTimeEntries($entries));
+
+        // Assert
+        $this->assertCount(20, $events);
+        foreach ($events as $event) {
+            $this->assertTrue($event->success);
+        }
+        $this->assertSame(8, $maxActiveReports);
+    }
+
+    /**
+     * @throws DestinationException
+     */
+    public function testSetsRequestTimeouts(): void
+    {
+        // Arrange
+        $entry = $this->createEntry('PROJ-1', 'Development');
+
+        /** @var Request[] $requests */
+        $requests = [];
+        $this->httpClient->expects($this->exactly(3))->method('request')->willReturnCallback(
+            function (Request $request) use (&$requests): Response {
+                $requests[] = $request;
+
+                return $request->getMethod() === 'GET'
+                    ? $this->createMetadataResponse($request)
+                    : $this->createResponse(200, []);
+            }
+        );
+
+        // Act
+        iterator_to_array($this->destination->logTimeEntries([$entry]));
+
+        // Assert
+        $this->assertCount(3, $requests);
+        foreach ($requests as $request) {
+            $this->assertSame(5.0, $request->getTcpConnectTimeout());
+            $this->assertSame(30.0, $request->getTransferTimeout());
+            $this->assertSame(30.0, $request->getInactivityTimeout());
+        }
+    }
+
+    /**
+     * @throws DestinationException
+     */
+    public function testReportsTimeoutAsUnknownDeliveryStatus(): void
+    {
+        // Arrange
+        $entry = $this->createEntry('PROJ-1', 'Development');
+
+        $this->httpClient->expects($this->exactly(3))->method('request')->willReturnCallback(
+            function (Request $request): Response {
+                if ($request->getMethod() === 'GET') {
+                    return $this->createMetadataResponse($request);
+                }
+
+                throw new TimeoutException('Allowed transfer timeout exceeded, took longer than 30 s');
+            }
+        );
+
+        // Act
+        $events = iterator_to_array($this->destination->logTimeEntries([$entry]));
+
+        // Assert
+        $this->assertCount(1, $events);
+        $this->assertFalse($events[0]->success);
+        $this->assertInstanceOf(DestinationException::class, $events[0]->error);
+        $this->assertSame(
+            'Timeout, delivery status is unknown: check YouTrack before retrying. '
+            . 'Allowed transfer timeout exceeded, took longer than 30 s',
+            $events[0]->error->getMessage()
+        );
+        $this->assertInstanceOf(TimeoutException::class, $events[0]->error->getPrevious());
+    }
+
+    /**
+     * Responds to project and work item type requests of the PROJ project
+     */
+    private function createMetadataResponse(Request $request): Response
+    {
+        if (str_contains($request->getUri()->getPath(), 'timeTrackingSettings')) {
+            return $this->createResponse(200, [
+                'workItemTypes' => [['id' => 't-1', 'name' => 'Development']],
+            ]);
+        }
+
+        return $this->createResponse(200, [
+            'project' => ['id' => 'p-1', 'name' => 'Project 1', 'shortName' => 'PROJ'],
+        ]);
     }
 
     protected function setUp(): void

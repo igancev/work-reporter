@@ -10,8 +10,10 @@ use Amp\Http\Client\DelegateHttpClient;
 use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
+use Amp\Http\Client\TimeoutException;
 use Amp\NullCancellation;
 use Amp\Pipeline\Queue;
+use Amp\Sync\LocalSemaphore;
 use Igancev\WorkReporter\Destination\DeliveryEvent;
 use Igancev\WorkReporter\Destination\DeliveryStream;
 use Igancev\WorkReporter\Destination\Destination;
@@ -30,8 +32,17 @@ use const JSON_THROW_ON_ERROR;
 
 final class YouTrackDestination implements Destination
 {
-    private const float TCP_CONNECT_TIMEOUT_SEC = 0.2;
-    private const float TIMEOUT_SEC = 2;
+    private const float TCP_CONNECT_TIMEOUT_SEC = 5;
+    /**
+     * Upper bound for a hung request, not an SLA: the timer covers server processing time,
+     * and YouTrack keeps processing a work item even after the client gave up on it.
+     */
+    private const float TIMEOUT_SEC = 30;
+    /**
+     * YouTrack processes work item creation almost sequentially, so flooding it with requests
+     * only makes each of them wait longer in the server queue.
+     */
+    private const int MAX_CONCURRENT_REPORTS = 8;
 
     private string $baseUrl;
     /** @var array<non-empty-string, string> */
@@ -64,29 +75,30 @@ final class YouTrackDestination implements Destination
         $queue = new Queue();
 
         async(function () use ($queue, $workItems, $timeEntries) {
+            $semaphore = new LocalSemaphore(self::MAX_CONCURRENT_REPORTS);
             $futures = [];
             foreach ($workItems as $index => $workItem) {
-                $futures[$index] = async(function () use ($queue, $workItem, $timeEntries, $index) {
+                $futures[$index] = async(function () use ($queue, $workItem, $timeEntries, $index, $semaphore) {
+                    // Measure the request itself, not the time spent waiting for a free slot
+                    $lock = $semaphore->acquire();
                     $startTime = hrtime(true);
+                    $error = null;
                     try {
                         $this->reportWorkItem($workItem);
-                        $durationMs = (hrtime(true) - $startTime) / 1_000_000;
-
-                        $queue->push(new DeliveryEvent(
-                            $timeEntries[$index],
-                            $durationMs,
-                            true,
-                        ));
                     } catch (Throwable $e) {
-                        $durationMs = (hrtime(true) - $startTime) / 1_000_000;
-
-                        $queue->push(new DeliveryEvent(
-                            $timeEntries[$index],
-                            $durationMs,
-                            false,
-                            $e,
-                        ));
+                        $error = $e;
+                    } finally {
+                        // Release before push: push waits for the consumer and must not hold the slot
+                        $lock->release();
                     }
+                    $durationMs = (hrtime(true) - $startTime) / 1_000_000;
+
+                    $queue->push(new DeliveryEvent(
+                        $timeEntries[$index],
+                        $durationMs,
+                        $error === null,
+                        $error,
+                    ));
                 });
             }
 
@@ -140,10 +152,7 @@ final class YouTrackDestination implements Destination
         foreach ($taskIdsUniqueByProject as $taskId) {
             $futures[] = async(function () use ($taskId): Response {
                 $url = $this->baseUrl . sprintf('issues/%s?fields=project(id,name,shortName)', $taskId->toString());
-                $request = new Request($url, 'GET');
-                $request->setHeaders($this->headers);
-                $request->setTcpConnectTimeout(self::TCP_CONNECT_TIMEOUT_SEC);
-                $request->setTransferTimeout(self::TIMEOUT_SEC);
+                $request = $this->createRequest($url, 'GET');
 
                 return $this->httpClient->request($request, new NullCancellation());
             });
@@ -211,10 +220,7 @@ final class YouTrackDestination implements Destination
                 'admin/projects/%s/timeTrackingSettings?top=-1&fields=workItemTypes(id,name)',
                 $project->id
             );
-            $request = new Request($url, 'GET');
-            $request->setHeaders($this->headers);
-            $request->setTcpConnectTimeout(self::TCP_CONNECT_TIMEOUT_SEC);
-            $request->setTransferTimeout(self::TIMEOUT_SEC);
+            $request = $this->createRequest($url, 'GET');
 
             $features[] = async(function () use ($request, $project): array {
                 try {
@@ -278,10 +284,7 @@ final class YouTrackDestination implements Destination
 
         try {
             $url = $this->baseUrl . sprintf('issues/%s/timeTracking/workItems', $workItem->taskId->toString());
-            $request = new Request($url, 'POST', json_encode($body, JSON_THROW_ON_ERROR));
-            $request->setHeaders($this->headers);
-            $request->setTcpConnectTimeout(self::TCP_CONNECT_TIMEOUT_SEC);
-            $request->setTransferTimeout(self::TIMEOUT_SEC);
+            $request = $this->createRequest($url, 'POST', json_encode($body, JSON_THROW_ON_ERROR));
 
             $response = $this->httpClient->request($request, new NullCancellation());
 
@@ -289,8 +292,30 @@ final class YouTrackDestination implements Destination
                 $errorBody = $response->getBody()->buffer();
                 throw new RuntimeException(sprintf('Failed to report time: %d %s', $response->getStatus(), $errorBody));
             }
+        } catch (TimeoutException $e) {
+            // The request may have reached YouTrack and be processed there after the client gave up
+            throw new DestinationException(
+                'Timeout, delivery status is unknown: check YouTrack before retrying. ' . $e->getMessage(),
+                ['taskId' => $workItem->taskId->toString()],
+                $e,
+            );
         } catch (Throwable $e) {
             throw new DestinationException($e->getMessage(), [], $e);
         }
+    }
+
+    /**
+     * @param non-empty-string $method
+     */
+    private function createRequest(string $url, string $method, string $body = ''): Request
+    {
+        $request = new Request($url, $method, $body);
+        $request->setHeaders($this->headers);
+        $request->setTcpConnectTimeout(self::TCP_CONNECT_TIMEOUT_SEC);
+        $request->setTransferTimeout(self::TIMEOUT_SEC);
+        // Default inactivity timeout (10 s) would otherwise cut off waiting for the response earlier
+        $request->setInactivityTimeout(self::TIMEOUT_SEC);
+
+        return $request;
     }
 }

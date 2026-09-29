@@ -22,20 +22,12 @@ use Testcontainers\Wait\WaitForHttp;
 #[CoversClass(PipelineDeliveryStream::class)]
 class YouTrackDestinationTest extends TestCase
 {
-    private StartedTestContainer $youtrackStartedContainer;
+    private static StartedTestContainer $youtrackStartedContainer;
 
     public function testLogTimeEntriesToRealYouTrack(): void
     {
         // Arrange
-        // instantiate YouTrackDestination with testcontainers YouTrack
-        $httpClient = HttpClientBuilder::buildDefault();
-        $host = $this->youtrackStartedContainer->getHost();
-        $port = $this->youtrackStartedContainer->getMappedPort(8080);
-        $destination = new YouTrackDestination(
-            $httpClient,
-            "http://{$host}:{$port}",
-            'perm-YWRtaW4=.NDEtMA==.ftTjeUcU3jtQZ0tYIq0PXteDQI19DD',
-        );
+        $destination = $this->createDestination();
 
         $entries = [
             new TimeEntry(
@@ -60,7 +52,48 @@ class YouTrackDestinationTest extends TestCase
         }
     }
 
-    protected function setUp(): void
+    /**
+     * Many concurrent requests must not fail by timeout while YouTrack processes them
+     */
+    public function testLogManyTimeEntriesToRealYouTrack(): void
+    {
+        // Arrange
+        $destination = $this->createDestination();
+
+        $entries = [];
+        for ($i = 0; $i < 100; $i++) {
+            $entries[] = new TimeEntry(
+                taskId: 'DEMO-' . ($i % 19 + 1),
+                duration: Duration::fromString('15m'),
+                workType: 'Development',
+                date: new DateTimeImmutable('today'),
+                comment: "Bulk work $i"
+            );
+        }
+
+        // Act
+        $events = iterator_to_array($destination->logTimeEntries($entries));
+
+        // Assert
+        self::assertCount(count($entries), $events);
+        foreach ($events as $event) {
+            self::assertTrue($event->success, $event->error?->getMessage() ?? '');
+        }
+    }
+
+    private function createDestination(): YouTrackDestination
+    {
+        $host = self::$youtrackStartedContainer->getHost();
+        $port = self::$youtrackStartedContainer->getMappedPort(8080);
+
+        return new YouTrackDestination(
+            HttpClientBuilder::buildDefault(),
+            "http://{$host}:{$port}",
+            'perm-YWRtaW4=.NDEtMA==.ftTjeUcU3jtQZ0tYIq0PXteDQI19DD',
+        );
+    }
+
+    public static function setUpBeforeClass(): void
     {
         $youtrackContainer = new GenericContainer(
             'ghcr.io/igancev/youtrack-image-for-ci/youtrack-image-for-ci:2026.1.12848'
@@ -71,11 +104,11 @@ class YouTrackDestinationTest extends TestCase
                     ->withPath('/api/config')
                     ->withTimeout(3 * 60 * 1000) // 3 minutes
             );
-        $this->youtrackStartedContainer = $youtrackContainer->start();
+        self::$youtrackStartedContainer = $youtrackContainer->start();
     }
 
-    protected function tearDown(): void
+    public static function tearDownAfterClass(): void
     {
-        $this->youtrackStartedContainer->stop();
+        self::$youtrackStartedContainer->stop();
     }
 }
